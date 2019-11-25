@@ -215,10 +215,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		
 		if(ctx.getChildCount() == 1) { // IDENT | LITERAL
 			if(ctx.IDENT() != null) {
-				
+				String varname = ctx.getChild(0).getText();
+				expr += "mov eax, dword [esp + " + symbolTable.getLocalOffset(varname) + "]\n";
 			} 
 			else if (ctx.LITERAL() != null) {
-				expr += ctx.LITERAL().getText();
+				expr += "mov eax, " + ctx.LITERAL().getText() + "\n";
 			}
 		}
 		else if(ctx.getChildCount() == 2) { // UnaryOperation
@@ -230,10 +231,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			} 
 			else if(ctx.getChild(1).getText().equals("=")) { 	// IDENT '=' expr
 				String varname = ctx.getChild(0).getText();
-				expr = "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], " + newTexts.get(ctx.getChild(2)) + "\n";
+				expr += newTexts.get(ctx.getChild(2));
+				expr += "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], eax\n";
 			} 
 			else { 											// binary operation
-				
+				expr = handleBinExpr(ctx, expr);
 			}
 		}
 		// IDENT '(' args ')' |  IDENT '[' expr ']'
@@ -254,8 +256,46 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 
 
 	private String handleBinExpr(MiniCParser.ExprContext ctx, String expr) {
-		// Not Implemented
-		return "";
+		String l2 = symbolTable.newLabel();
+		String lend = symbolTable.newLabel();
+		
+		String expr1 = newTexts.get(ctx.expr(0));
+		String expr2 = newTexts.get(ctx.expr(1));
+		
+		switch (ctx.getChild(1).getText()) {
+			case "*":
+				break;
+			case "/":
+				break;
+			case "%":
+				break;
+			case "+":		// expr(0) expr(1) iadd
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "add eax, ebx\n";
+				break;
+			case "-":
+				break;
+			case "==":
+				break;
+			case "!=":
+				break;
+			case "<=":
+				break;
+			case "<":
+				break;
+			case ">=":
+				break;
+			case ">":
+				break;
+			case "and":
+				break;
+			case "or":
+				break;
+
+		}
+		return expr;
 	}
 	private String handleFunCall(MiniCParser.ExprContext ctx, String expr) {
 		// Not Implemented

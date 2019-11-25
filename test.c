@@ -7,7 +7,7 @@ void main()
 	int b = 2;
 	int c = 3;
 	int d = 4;
-	a = 60;
+	a = b + c + d;
 }
 
 
