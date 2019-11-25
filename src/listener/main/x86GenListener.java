@@ -77,7 +77,8 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				+ "extern printf\n\n"
 				+ func + "\n\n";
 		
-		var = "section .data"
+		var = "section .data\n"
+				+ "format db \"%d\", 10, 0"
 				+ var;
 		
 		String str = func + var;
