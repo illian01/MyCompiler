@@ -13,7 +13,7 @@ import generated.MiniCParser.ParamsContext;
 import generated.MiniCParser.Type_specContext;
 import generated.MiniCParser.Var_declContext;
 import listener.main.SymbolTable.Type;
-import static listener.main.BytecodeGenListenerHelper.*;
+import static listener.main.x86GenListenerHelper.*;
 
 
 public class SymbolTable {

@@ -19,10 +19,10 @@ import generated.MiniCParser.StmtContext;
 import generated.MiniCParser.Type_specContext;
 import generated.MiniCParser.Var_declContext;
 
-import static listener.main.BytecodeGenListenerHelper.*;
+import static listener.main.x86GenListenerHelper.*;
 import static listener.main.SymbolTable.*;
 
-public class BytecodeGenListener extends MiniCBaseListener implements ParseTreeListener {
+public class x86GenListener extends MiniCBaseListener implements ParseTreeListener {
 	ParseTreeProperty<String> newTexts = new ParseTreeProperty<String>();
 	SymbolTable symbolTable = new SymbolTable();
 	
