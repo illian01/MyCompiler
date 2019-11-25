@@ -88,6 +88,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				+ func + "\n\n";
 		
 		var = "section .data\n"
+				+ "format db \"%d\", 10, 0\n"
 				+ var;
 		
 		String str = func + var;
@@ -240,7 +241,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		}
 		// IDENT '(' args ')' |  IDENT '[' expr ']'
 		else if(ctx.getChildCount() == 4) {
-			
+			if(ctx.args() != null){		// function calls
+				expr = handleFunCall(ctx, expr);
+			} else { // expr
+				// Arrays: TODO  
+			}
 		}
 		// IDENT '[' expr ']' '=' expr
 		else { // Arrays: TODO			*/
@@ -298,14 +303,26 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		return expr;
 	}
 	private String handleFunCall(MiniCParser.ExprContext ctx, String expr) {
-		// Not Implemented
-		return "";
+		String funName = getFunName(ctx);
+		if(funName.equals("print_d")) {
+			expr = newTexts.get(ctx.args())
+					+ "push dword eax\n"
+					+ "push dword format\n"
+					+ "call printf\n"
+					+ "add esp, 8\n";
+		}
+		return expr;
 	}
 
 	// args	: expr (',' expr)* | ;
 	@Override
 	public void exitArgs(MiniCParser.ArgsContext ctx) {
-
+		String argsStr = "";
+		
+		for (int i=0; i < ctx.expr().size() ; i++) {
+			argsStr += newTexts.get(ctx.expr(i)) ; 
+		}		
+		newTexts.put(ctx, argsStr);
 	}
 
 }

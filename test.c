@@ -8,6 +8,8 @@ void main()
 	int c = 3;
 	int d = 4;
 	a = b + c + d;
+	func();
+	print_d(a);
 }
 
 
