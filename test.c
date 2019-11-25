@@ -1,4 +1,5 @@
 int g;
+int g2 = 100;
 void main () 
 {
 	int a;

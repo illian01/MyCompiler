@@ -36,7 +36,16 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	// var_decl	: type_spec IDENT ';' | type_spec IDENT '=' LITERAL ';'|type_spec IDENT '[' LITERAL ']' ';'
 	@Override
 	public void enterVar_decl(MiniCParser.Var_declContext ctx) {
-		// Not Implemented
+		String varname = getGlobalVarName(ctx);
+		if(isArrayDecl(ctx)) {
+			// Not Implemented
+		}
+		else if(isDeclWithInit(ctx)) {
+			symbolTable.putGlobalVarWithInitVal(varname, Type.INT, initVal(ctx));
+		}
+		else {
+			symbolTable.putGlobalVarWithInitVal(varname, Type.INT, 0);
+		}
 	}
 
 	
@@ -134,7 +143,19 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	
 	@Override
 	public void exitVar_decl(MiniCParser.Var_declContext ctx) {
-		// Not Implemented
+		String varname = getGlobalVarName(ctx);
+		String str = "";
+		if(isArrayDecl(ctx)) {
+			// Not Implemented
+		}
+		else if(isDeclWithInit(ctx)) {
+			str += varname + " DD " + initVal(ctx) + "\n";
+		}
+		else {
+			str += varname + " DD 0\n";
+		}
+		
+		newTexts.put(ctx, str);
 	}
 
 	

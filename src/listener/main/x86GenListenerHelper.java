@@ -125,6 +125,10 @@ public class x86GenListenerHelper {
 		return local_decl.getChild(1).getText();
 	}
 	
+	static String getGlobalVarName(MiniCParser.Var_declContext global_decl) {
+		return global_decl.getChild(1).getText();
+	}
+	
 	static String getFunName(Fun_declContext ctx) {
 		return ctx.getChild(1).getText();
 	}
