@@ -42,7 +42,16 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	
 	@Override
 	public void enterLocal_decl(MiniCParser.Local_declContext ctx) {			
-		// Not Implemented
+		String varname = getLocalVarName(ctx);
+		if(isArrayDecl(ctx)) {
+			// Not Implemented
+		}
+		else if(isDeclWithInit(ctx)) {
+			symbolTable.putLocalVarWithInitVal(varname, Type.INT, initVal(ctx));
+		}
+		else {
+			symbolTable.putLocalVar(varname, Type.INT);
+		}
 	}
 
 	
@@ -81,6 +90,14 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	@Override
 	public void exitFun_decl(MiniCParser.Fun_declContext ctx) {
 		// Not Implemented
+		String str = "";
+		str += getFunName(ctx) + ":\n";
+		str += "sub esp, " + symbolTable.getTotalLocalOffset() + "\n";
+		str += newTexts.get(ctx.getChild(ctx.getChildCount() - 1));
+		str += "add esp, " + symbolTable.getTotalLocalOffset() + "\n";
+		str += "ret\n";
+		
+		System.out.println(str);
 	}
 	
 
@@ -99,7 +116,31 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	// compound_stmt	: '{' local_decl* stmt* '}'
 	@Override
 	public void exitCompound_stmt(MiniCParser.Compound_stmtContext ctx) {
-		// Not Implemented
+		String str = "";
+		
+		for(int i = 0; i < ctx.local_decl().size(); i++)
+			str += newTexts.get(ctx.local_decl(i));
+		for(int i = 0; i < ctx.stmt().size(); i++)
+			str += newTexts.get(ctx.stmt(i));
+		
+		newTexts.put(ctx, str);
+	}
+	
+	@Override
+	public void exitLocal_decl(MiniCParser.Local_declContext ctx) {			
+		String varname = getLocalVarName(ctx);
+		String str = "";
+		if(isArrayDecl(ctx)) {
+			// Not Implemented
+		}
+		else if(isDeclWithInit(ctx)) {
+			str += "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], " + initVal(ctx) + "\n";
+		}
+		else {
+			
+		}
+		
+		newTexts.put(ctx, str);
 	}
 
 	// if_stmt	: IF '(' expr ')' stmt | IF '(' expr ')' stmt ELSE stmt;

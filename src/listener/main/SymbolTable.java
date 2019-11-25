@@ -180,8 +180,12 @@ public class SymbolTable {
 		return sname;
 	}
 	
-	public int getLocalOffset() {
+	public int getTotalLocalOffset() {
 		return _localOffset;
+	}
+	
+	public int getLocalOffset(String varname) {
+		return _lsymtable.get(varname).offset;
 	}
 	
 }

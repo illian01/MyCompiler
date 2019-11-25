@@ -1,7 +1,7 @@
 void main () 
 {
 	int a;
-	int b;
-	int c;
-	int d;
+	int b = 2;
+	int c = 3;
+	int d = 4;
 }
