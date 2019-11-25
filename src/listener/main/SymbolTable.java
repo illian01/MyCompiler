@@ -70,7 +70,8 @@ public class SymbolTable {
 		_lsymtable.clear();
 		_localVarID = 0;
 		_labelID = 0;
-		_tempVarID = 32;		
+		_tempVarID = 32;
+		_localOffset = 0;
 	}
 	
 	void putLocalVar(String varname, Type type){

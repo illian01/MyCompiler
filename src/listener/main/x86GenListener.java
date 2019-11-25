@@ -30,6 +30,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	
 	@Override
 	public void enterFun_decl(MiniCParser.Fun_declContext ctx) {
+		symbolTable.initFunDecl();
 		// Not Implemented
 	}
 	
@@ -104,13 +105,13 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	// stmt	: expr_stmt | compound_stmt | if_stmt | while_stmt | return_stmt
 	@Override
 	public void exitStmt(MiniCParser.StmtContext ctx) {
-		// Not Implemented
+		newTexts.put(ctx, newTexts.get(ctx.getChild(0)));
 	}
 	
 	// expr_stmt	: expr ';'
 	@Override
 	public void exitExpr_stmt(MiniCParser.Expr_stmtContext ctx) {
-		// Not Implemented
+		newTexts.put(ctx, newTexts.get(ctx.getChild(0)));
 	}
 	
 	
@@ -129,7 +130,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		str += "sub esp, " + symbolTable.getTotalLocalOffset() + "\n";
 		str += newTexts.get(ctx.getChild(ctx.getChildCount() - 1));
 		str += "add esp, " + symbolTable.getTotalLocalOffset() + "\n";
-		str += "ret\n";
+		str += "ret\n\n";
 		
 		newTexts.put(ctx, str);
 	}
@@ -205,7 +206,44 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	
 	@Override
 	public void exitExpr(MiniCParser.ExprContext ctx) {
-		// Not Implemented
+		String expr = "";
+
+		if(ctx.getChildCount() <= 0) {
+			newTexts.put(ctx, ""); 
+			return;
+		}		
+		
+		if(ctx.getChildCount() == 1) { // IDENT | LITERAL
+			if(ctx.IDENT() != null) {
+				
+			} 
+			else if (ctx.LITERAL() != null) {
+				expr += ctx.LITERAL().getText();
+			}
+		}
+		else if(ctx.getChildCount() == 2) { // UnaryOperation
+			
+		}
+		else if(ctx.getChildCount() == 3) {	 
+			if(ctx.getChild(0).getText().equals("(")) { 		// '(' expr ')'
+				
+			} 
+			else if(ctx.getChild(1).getText().equals("=")) { 	// IDENT '=' expr
+				String varname = ctx.getChild(0).getText();
+				expr = "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], " + newTexts.get(ctx.getChild(2)) + "\n";
+			} 
+			else { 											// binary operation
+				
+			}
+		}
+		// IDENT '(' args ')' |  IDENT '[' expr ']'
+		else if(ctx.getChildCount() == 4) {
+			
+		}
+		// IDENT '[' expr ']' '=' expr
+		else { // Arrays: TODO			*/
+		}
+		newTexts.put(ctx, expr);
 	}
 
 
