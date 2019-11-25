@@ -57,14 +57,39 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	
 	@Override
 	public void exitProgram(MiniCParser.ProgramContext ctx) {
-		// Not Implemented
+		String func = "";
+		String var = "";
+		
+		for(int i = 0; i < ctx.getChildCount(); i++) {
+			if(ctx.decl(i).fun_decl() != null)
+				if(newTexts.get(ctx.decl(i)) != null)
+					func += newTexts.get(ctx.decl(i));
+		}
+		
+		for(int i = 0; i < ctx.getChildCount(); i++) {
+			if(ctx.decl(i).var_decl() != null)
+				if(newTexts.get(ctx.decl(i)) != null)
+					var += newTexts.get(ctx.decl(i));
+		}
+		
+		func = "section .text\n"
+				+ "global main\n" 
+				+ "extern printf\n\n"
+				+ func + "\n\n";
+		
+		var = "section .data"
+				+ var;
+		
+		String str = func + var;
+		newTexts.put(ctx, str);
+		System.out.println(newTexts.get(ctx));
 	}	
 	
 	
 	// decl	: var_decl | fun_decl
 	@Override
 	public void exitDecl(MiniCParser.DeclContext ctx) {
-		// Not Implemented
+		newTexts.put(ctx, newTexts.get(ctx.getChild(0)));
 	}
 	
 	// stmt	: expr_stmt | compound_stmt | if_stmt | while_stmt | return_stmt
@@ -97,7 +122,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		str += "add esp, " + symbolTable.getTotalLocalOffset() + "\n";
 		str += "ret\n";
 		
-		System.out.println(str);
+		newTexts.put(ctx, str);
 	}
 	
 

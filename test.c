@@ -1,3 +1,4 @@
+int g;
 void main () 
 {
 	int a;
