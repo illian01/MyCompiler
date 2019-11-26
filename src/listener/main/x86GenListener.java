@@ -212,12 +212,14 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		if(ctx.getChildCount() <= 0) {
 			newTexts.put(ctx, ""); 
 			return;
-		}		
-		
+		}
 		if(ctx.getChildCount() == 1) { // IDENT | LITERAL
 			if(ctx.IDENT() != null) {
 				String varname = ctx.getChild(0).getText();
-				expr += "mov eax, dword [esp + " + symbolTable.getLocalOffset(varname) + "]\n";
+				if(symbolTable.isLocalVar(varname))
+					expr += "mov eax, dword [esp + " + symbolTable.getLocalOffset(varname) + "]\n";
+				else
+					expr += "mov eax, [" + varname + "]\n";
 			} 
 			else if (ctx.LITERAL() != null) {
 				expr += "mov eax, " + ctx.LITERAL().getText() + "\n";

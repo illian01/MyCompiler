@@ -9,7 +9,7 @@ void main()
 	int d = 4;
 	a = b + c + d;
 	func();
-	print_d(a);
+	print_d(g2);
 }
 
 

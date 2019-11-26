@@ -189,4 +189,7 @@ public class SymbolTable {
 		return _lsymtable.get(varname).offset;
 	}
 	
+	public boolean isLocalVar(String varname) {
+		return _lsymtable.containsKey(varname);
+	}
 }
