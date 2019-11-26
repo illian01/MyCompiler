@@ -226,7 +226,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			}
 		}
 		else if(ctx.getChildCount() == 2) { // UnaryOperation
-			
+			expr = handleUnaryExpr(ctx, expr);	
 		}
 		else if(ctx.getChildCount() == 3) {	 
 			if(ctx.getChild(0).getText().equals("(")) { 		// '(' expr ')'
@@ -257,8 +257,33 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 
 
 	private String handleUnaryExpr(MiniCParser.ExprContext ctx, String expr) {
-		// Not Implemented
-		return "";
+		String l1 = symbolTable.newLabel();
+		String l2 = symbolTable.newLabel();
+		String lend = symbolTable.newLabel();
+		
+		expr += newTexts.get(ctx.expr(0));
+		switch(ctx.getChild(0).getText()) {
+		case "-":
+			expr += "neg eax\n";
+			break;
+		case "--":
+			expr += "dec eax\n";
+			break;
+		case "++":
+			expr += "inc eax\n";
+			break;
+		case "!":
+			expr += "cmp eax, 0\n"
+					+ "je " + l2 + "\n"
+					+ l1 + ":\n"
+					+ "mov eax, 0\n"
+					+ "jmp " + lend + "\n"
+					+ l2 + ":\n"
+					+ "mov eax, 1\n"
+					+ lend + ":\n";
+			break;
+		}
+		return expr;
 	}
 
 
