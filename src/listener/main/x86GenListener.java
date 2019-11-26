@@ -401,8 +401,16 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				expr += lend + ":\n";
 				break;
 			case "and":
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "and eax, ebx\n";
 				break;
 			case "or":
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "or eax, ebx\n";
 				break;
 
 		}

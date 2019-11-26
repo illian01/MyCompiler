@@ -1,27 +1,8 @@
 void main() 
 {
-	int a = 5;
-	int b = 2;
-	int c = 2;
-	print_d(a == b);
-	print_d(b == c);
+	int a = 3;
+	int b = 1;
 	
-	print_d(a != b);
-	print_d(b != c);
-	
-	print_d(a <= b);
-	print_d(b <= c);
-	print_d(c <= a);
-	
-	print_d(a < b);
-	print_d(b < c);
-	print_d(c < a);
-	
-	print_d(a >= b);
-	print_d(b >= c);
-	print_d(c >= a);
-	
-	print_d(a > b);
-	print_d(b > c);
-	print_d(c > a);
+	print_d(a and b);
+	print_d(a or b);
 }
