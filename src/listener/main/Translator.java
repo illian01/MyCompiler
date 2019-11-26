@@ -7,11 +7,11 @@ import generated.*;
 
 public class Translator {
 	enum OPTIONS {
-		PRETTYPRINT, BYTECODEGEN, UCODEGEN, ERROR
+		PRETTYPRINT, X86, UCODEGEN, ERROR
 	}
 	private static OPTIONS getOption(String[] args){
 		if (args.length < 1)
-			return OPTIONS.BYTECODEGEN;
+			return OPTIONS.X86;
 		
 		if (args[0].startsWith("-p") 
 				|| args[0].startsWith("-P"))
@@ -19,7 +19,7 @@ public class Translator {
 		
 		if (args[0].startsWith("-b") 
 				|| args[0].startsWith("-B"))
-			return OPTIONS.BYTECODEGEN;
+			return OPTIONS.X86;
 		
 		if (args[0].startsWith("-u") 
 				|| args[0].startsWith("-U"))
@@ -41,8 +41,8 @@ public class Translator {
 			case PRETTYPRINT : 		
 				walker.walk(new MiniCPrintListener(), tree);
 				break;
-			case BYTECODEGEN:
-				walker.walk(new BytecodeGenListener(), tree );
+			case X86:
+				walker.walk(new x86GenListener(), tree );
 				break;
 			/*	
 			case UCODEGEN:

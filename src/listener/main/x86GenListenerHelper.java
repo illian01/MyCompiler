@@ -1,7 +1,7 @@
 package listener.main;
 
-import static listener.main.BytecodeGenListenerHelper.isIntF;
-import static listener.main.BytecodeGenListenerHelper.isVoidF;
+import static listener.main.x86GenListenerHelper.isIntF;
+import static listener.main.x86GenListenerHelper.isVoidF;
 
 import java.util.Hashtable;
 
@@ -18,7 +18,7 @@ import listener.main.SymbolTable;
 import listener.main.SymbolTable.Type;
 import listener.main.SymbolTable.VarInfo;
 
-public class BytecodeGenListenerHelper {
+public class x86GenListenerHelper {
 	
 	// <boolean functions>
 	
@@ -123,6 +123,10 @@ public class BytecodeGenListenerHelper {
 	
 	static String getLocalVarName(Local_declContext local_decl) {
 		return local_decl.getChild(1).getText();
+	}
+	
+	static String getGlobalVarName(MiniCParser.Var_declContext global_decl) {
+		return global_decl.getChild(1).getText();
 	}
 	
 	static String getFunName(Fun_declContext ctx) {

@@ -13,7 +13,7 @@ import generated.MiniCParser.ParamsContext;
 import generated.MiniCParser.Type_specContext;
 import generated.MiniCParser.Var_declContext;
 import listener.main.SymbolTable.Type;
-import static listener.main.BytecodeGenListenerHelper.*;
+import static listener.main.x86GenListenerHelper.*;
 
 
 public class SymbolTable {
@@ -25,11 +25,19 @@ public class SymbolTable {
 		Type type; 
 		int id;
 		int initVal;
+		int offset;
 		
-		public VarInfo(Type type,  int id, int initVal) {
+		public VarInfo(Type type,  int id, int initVal, int offset) {
 			this.type = type;
 			this.id = id;
 			this.initVal = initVal;
+			this.offset = offset;
+		}
+		public VarInfo(Type type,  int id, int offset) {
+			this.type = type;
+			this.id = id;
+			this.initVal = 0;
+			this.offset = offset;
 		}
 		public VarInfo(Type type,  int id) {
 			this.type = type;
@@ -46,6 +54,7 @@ public class SymbolTable {
 	private Map<String, VarInfo> _gsymtable = new HashMap<>();	// global v.
 	private Map<String, FInfo> _fsymtable = new HashMap<>();	// function 
 	
+	private int _localOffset = 0;
 		
 	private int _globalVarID = 0;
 	private int _localVarID = 0;
@@ -61,11 +70,13 @@ public class SymbolTable {
 		_lsymtable.clear();
 		_localVarID = 0;
 		_labelID = 0;
-		_tempVarID = 32;		
+		_tempVarID = 32;
+		_localOffset = 0;
 	}
 	
 	void putLocalVar(String varname, Type type){
-		this._lsymtable.put(varname, new VarInfo(type, _localVarID++));
+		this._lsymtable.put(varname, new VarInfo(type, _localVarID++, _localOffset));
+		_localOffset += 4;
 	}
 	
 	void putGlobalVar(String varname, Type type){
@@ -73,7 +84,8 @@ public class SymbolTable {
 	}
 	
 	void putLocalVarWithInitVal(String varname, Type type, int initVar){
-		this._lsymtable.put(varname, new VarInfo(type, _localVarID++, initVar));
+		this._lsymtable.put(varname, new VarInfo(type, _localVarID++, initVar, _localOffset));
+		_localOffset += 4;
 	}
 	void putGlobalVarWithInitVal(String varname, Type type, int initVar){
 		this._gsymtable.put(varname, new VarInfo(type, _globalVarID++, initVar));
@@ -167,6 +179,14 @@ public class SymbolTable {
 		String sname = "";
 		sname += getVarId(ctx.IDENT().getText());
 		return sname;
+	}
+	
+	public int getTotalLocalOffset() {
+		return _localOffset;
+	}
+	
+	public int getLocalOffset(String varname) {
+		return _lsymtable.get(varname).offset;
 	}
 	
 }
