@@ -194,7 +194,34 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	// if_stmt	: IF '(' expr ')' stmt | IF '(' expr ')' stmt ELSE stmt;
 	@Override
 	public void exitIf_stmt(MiniCParser.If_stmtContext ctx) {
-		// Not Implemented
+		String stmt = "";
+		String condExpr= newTexts.get(ctx.expr());
+		String thenStmt = newTexts.get(ctx.stmt(0));
+		
+		String lend = symbolTable.newLabel();
+		String lelse = symbolTable.newLabel();
+		
+		
+		if(noElse(ctx)) {		
+			stmt += condExpr
+				+ "cmp eax, 0\n"
+				+ "je " + lend + "\n"
+				+ thenStmt
+				+ lend + ":" + "\n";	
+		}
+		else {
+			String elseStmt = newTexts.get(ctx.stmt(1));
+			stmt += condExpr
+					+ "cmp eax, 0\n"
+					+ "je " + lelse + "\n"
+					+ thenStmt
+					+ "jmp " + lend + "\n"
+					+ lelse + ": \n"
+					+ elseStmt
+					+ lend + ":"  + "\n";	
+		}
+		
+		newTexts.put(ctx, stmt);
 	}
 	
 	
