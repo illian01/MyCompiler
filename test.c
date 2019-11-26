@@ -1,20 +1,14 @@
 void main() 
 {
-	int a = 3;
-	int b = 1;
-	int c = 3;
+	int i = 0;
+	int sum = 0;
+	int n = 100;
 	
-	if(a == b) 
+	while(i <= n)
 	{
-		print_d(1);
-	}
-	else
-	{
-		print_d(0);
+		sum = sum + i;
+		i = i + 1;
 	}
 	
-	if(a == c)
-	{
-		print_d(2);
-	}
+	print_d(sum);
 }

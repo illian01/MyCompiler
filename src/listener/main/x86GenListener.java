@@ -119,7 +119,24 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	// while_stmt	: WHILE '(' expr ')' stmt
 	@Override
 	public void exitWhile_stmt(MiniCParser.While_stmtContext ctx) { 
-		// Not Implemented
+		String stmt = "";
+		String expr = newTexts.get(ctx.expr());
+		String bodystmt = newTexts.get(ctx.stmt());
+		
+		String lend = symbolTable.newLabel();
+		String lelse = symbolTable.newLabel();
+		
+			
+		stmt += "jmp " + lelse + "\n"
+				+ lend + ": \n"
+				+ bodystmt
+				+ lelse + ": " + "\n"
+				+ expr
+				+ "cmp eax, 0\n"
+				+ "jne " + lend + "\n";	
+
+		
+		newTexts.put(ctx, stmt);
 	}
 	
 	
