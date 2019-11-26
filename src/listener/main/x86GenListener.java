@@ -271,10 +271,25 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		
 		switch (ctx.getChild(1).getText()) {
 			case "*":
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "imul eax, ebx\n";
 				break;
 			case "/":
+				expr += expr2;
+				expr += "mov ecx, eax\n";
+				expr += expr1;
+				expr += "mov edx, 0\n";
+				expr += "div ecx\n";
 				break;
 			case "%":
+				expr += expr2;
+				expr += "mov ecx, eax\n";
+				expr += expr1;
+				expr += "mov edx, 0\n";
+				expr += "div ecx\n";
+				expr += "mov eax, edx\n";
 				break;
 			case "+":		// expr(0) expr(1) iadd
 				expr += expr1;
@@ -283,6 +298,10 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				expr += "add eax, ebx\n";
 				break;
 			case "-":
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += expr1;
+				expr += "sub eax, ebx\n";
 				break;
 			case "==":
 				break;
