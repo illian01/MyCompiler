@@ -119,7 +119,24 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	// while_stmt	: WHILE '(' expr ')' stmt
 	@Override
 	public void exitWhile_stmt(MiniCParser.While_stmtContext ctx) { 
-		// Not Implemented
+		String stmt = "";
+		String expr = newTexts.get(ctx.expr());
+		String bodystmt = newTexts.get(ctx.stmt());
+		
+		String lend = symbolTable.newLabel();
+		String lelse = symbolTable.newLabel();
+		
+			
+		stmt += "jmp " + lelse + "\n"
+				+ lend + ": \n"
+				+ bodystmt
+				+ lelse + ": " + "\n"
+				+ expr
+				+ "cmp eax, 0\n"
+				+ "jne " + lend + "\n";	
+
+		
+		newTexts.put(ctx, stmt);
 	}
 	
 	
@@ -194,7 +211,34 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	// if_stmt	: IF '(' expr ')' stmt | IF '(' expr ')' stmt ELSE stmt;
 	@Override
 	public void exitIf_stmt(MiniCParser.If_stmtContext ctx) {
-		// Not Implemented
+		String stmt = "";
+		String condExpr= newTexts.get(ctx.expr());
+		String thenStmt = newTexts.get(ctx.stmt(0));
+		
+		String lend = symbolTable.newLabel();
+		String lelse = symbolTable.newLabel();
+		
+		
+		if(noElse(ctx)) {		
+			stmt += condExpr
+				+ "cmp eax, 0\n"
+				+ "je " + lend + "\n"
+				+ thenStmt
+				+ lend + ":" + "\n";	
+		}
+		else {
+			String elseStmt = newTexts.get(ctx.stmt(1));
+			stmt += condExpr
+					+ "cmp eax, 0\n"
+					+ "je " + lelse + "\n"
+					+ thenStmt
+					+ "jmp " + lend + "\n"
+					+ lelse + ": \n"
+					+ elseStmt
+					+ lend + ":"  + "\n";	
+		}
+		
+		newTexts.put(ctx, stmt);
 	}
 	
 	
@@ -212,19 +256,21 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		if(ctx.getChildCount() <= 0) {
 			newTexts.put(ctx, ""); 
 			return;
-		}		
-		
+		}
 		if(ctx.getChildCount() == 1) { // IDENT | LITERAL
 			if(ctx.IDENT() != null) {
 				String varname = ctx.getChild(0).getText();
-				expr += "mov eax, dword [esp + " + symbolTable.getLocalOffset(varname) + "]\n";
+				if(symbolTable.isLocalVar(varname))
+					expr += "mov eax, dword [esp + " + symbolTable.getLocalOffset(varname) + "]\n";
+				else
+					expr += "mov eax, [" + varname + "]\n";
 			} 
 			else if (ctx.LITERAL() != null) {
 				expr += "mov eax, " + ctx.LITERAL().getText() + "\n";
 			}
 		}
 		else if(ctx.getChildCount() == 2) { // UnaryOperation
-			
+			expr = handleUnaryExpr(ctx, expr);	
 		}
 		else if(ctx.getChildCount() == 3) {	 
 			if(ctx.getChild(0).getText().equals("(")) { 		// '(' expr ')'
@@ -255,8 +301,33 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 
 
 	private String handleUnaryExpr(MiniCParser.ExprContext ctx, String expr) {
-		// Not Implemented
-		return "";
+		String l1 = symbolTable.newLabel();
+		String l2 = symbolTable.newLabel();
+		String lend = symbolTable.newLabel();
+		
+		expr += newTexts.get(ctx.expr(0));
+		switch(ctx.getChild(0).getText()) {
+		case "-":
+			expr += "neg eax\n";
+			break;
+		case "--":
+			expr += "dec eax\n";
+			break;
+		case "++":
+			expr += "inc eax\n";
+			break;
+		case "!":
+			expr += "cmp eax, 0\n"
+					+ "je " + l2 + "\n"
+					+ l1 + ":\n"
+					+ "mov eax, 0\n"
+					+ "jmp " + lend + "\n"
+					+ l2 + ":\n"
+					+ "mov eax, 1\n"
+					+ lend + ":\n";
+			break;
+		}
+		return expr;
 	}
 
 
@@ -269,10 +340,25 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		
 		switch (ctx.getChild(1).getText()) {
 			case "*":
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "imul eax, ebx\n";
 				break;
 			case "/":
+				expr += expr2;
+				expr += "mov ecx, eax\n";
+				expr += expr1;
+				expr += "mov edx, 0\n";
+				expr += "div ecx\n";
 				break;
 			case "%":
+				expr += expr2;
+				expr += "mov ecx, eax\n";
+				expr += expr1;
+				expr += "mov edx, 0\n";
+				expr += "div ecx\n";
+				expr += "mov eax, edx\n";
 				break;
 			case "+":		// expr(0) expr(1) iadd
 				expr += expr1;
@@ -281,22 +367,94 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				expr += "add eax, ebx\n";
 				break;
 			case "-":
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += expr1;
+				expr += "sub eax, ebx\n";
 				break;
 			case "==":
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += expr1;
+				expr += "cmp eax, ebx\n";
+				expr += "je " + l2 + "\n";
+				expr += "mov eax, 0\n";
+				expr += "jmp " + lend + "\n";
+				expr += l2 + ":\n";
+				expr += "mov eax, 1\n";
+				expr += lend + ":\n";
 				break;
 			case "!=":
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += expr1;
+				expr += "cmp eax, ebx\n";
+				expr += "jne " + l2 + "\n";
+				expr += "mov eax, 0\n";
+				expr += "jmp " + lend + "\n";
+				expr += l2 + ":\n";
+				expr += "mov eax, 1\n";
+				expr += lend + ":\n";
 				break;
 			case "<=":
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += expr1;
+				expr += "cmp eax, ebx\n";
+				expr += "jle " + l2 + "\n";
+				expr += "mov eax, 0\n";
+				expr += "jmp " + lend + "\n";
+				expr += l2 + ":\n";
+				expr += "mov eax, 1\n";
+				expr += lend + ":\n";
 				break;
 			case "<":
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += expr1;
+				expr += "cmp eax, ebx\n";
+				expr += "jl " + l2 + "\n";
+				expr += "mov eax, 0\n";
+				expr += "jmp " + lend + "\n";
+				expr += l2 + ":\n";
+				expr += "mov eax, 1\n";
+				expr += lend + ":\n";
 				break;
 			case ">=":
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += expr1;
+				expr += "cmp eax, ebx\n";
+				expr += "jge " + l2 + "\n";
+				expr += "mov eax, 0\n";
+				expr += "jmp " + lend + "\n";
+				expr += l2 + ":\n";
+				expr += "mov eax, 1\n";
+				expr += lend + ":\n";
 				break;
 			case ">":
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += expr1;
+				expr += "cmp eax, ebx\n";
+				expr += "jg " + l2 + "\n";
+				expr += "mov eax, 0\n";
+				expr += "jmp " + lend + "\n";
+				expr += l2 + ":\n";
+				expr += "mov eax, 1\n";
+				expr += lend + ":\n";
 				break;
 			case "and":
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "and eax, ebx\n";
 				break;
 			case "or":
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "or eax, ebx\n";
 				break;
 
 		}

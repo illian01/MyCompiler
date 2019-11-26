@@ -1,21 +1,14 @@
-int g;
-int g2 = 100;
-
 void main() 
 {
-	int a;
-	int b = 2;
-	int c = 3;
-	int d = 4;
-	a = b + c + d;
-	func();
-	print_d(a);
-}
-
-
-void func()
-{
-	int n;
+	int i = 0;
+	int sum = 0;
+	int n = 100;
 	
-	n = 100;
+	while(i <= n)
+	{
+		sum = sum + i;
+		i = i + 1;
+	}
+	
+	print_d(sum);
 }
