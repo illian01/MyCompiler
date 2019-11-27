@@ -162,4 +162,11 @@ public class x86GenListenerHelper {
 	static int get_localArraysize(MiniCParser.Local_declContext ctx) {
 		return Integer.parseInt(ctx.getChild(3).getText()); 
 	}
+	static int get_operand(MiniCParser.ExprContext ctx) {
+		return Integer.parseInt(ctx.getChild(5).getChild(0).getText()); 
+	}
+	static int get_intarrayindex(MiniCParser.ExprContext ctx) {
+		return Integer.parseInt(ctx.getChild(2).getChild(0).getText())*4; 
+	}
+	
 }

@@ -196,7 +196,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		String varname = getLocalVarName(ctx);
 		String str = "";
 		if(isArrayDecl(ctx)) {
-			str += "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "]\n";
+			//not essential
 		}
 		else if(isDeclWithInit(ctx)) {
 			str += "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], " + initVal(ctx) + "\n";
@@ -279,7 +279,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			else if(ctx.getChild(1).getText().equals("=")) { 	// IDENT '=' expr
 				String varname = ctx.getChild(0).getText();
 				expr += newTexts.get(ctx.getChild(2));
-				expr += "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], eax\n";
+				expr += "mov dword [esp + "+ symbolTable.getLocalOffset(varname)+ "], eax\n";
 			} 
 			else { 											// binary operation
 				expr = handleBinExpr(ctx, expr);
@@ -290,11 +290,16 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			if(ctx.args() != null){		// function calls
 				expr = handleFunCall(ctx, expr);
 			} else { // expr
-				// Arrays: TODO  
+				String varname = ctx.getChild(0).getText();
+				int offset = symbolTable.getLocalOffset(varname)+ get_intarrayindex(ctx);
+				expr += "mov eax, dword [esp + " +offset+"]\n";
 			}
 		}
 		// IDENT '[' expr ']' '=' expr
-		else { // Arrays: TODO			*/
+		else { // Arrays: TODO			
+			String varname = ctx.getChild(0).getText();
+			int offset = symbolTable.getLocalOffset(varname)+ get_intarrayindex(ctx);
+			expr += "mov dword [esp + " +offset+"], "+get_operand(ctx)+"\n";
 		}
 		newTexts.put(ctx, expr);
 	}
