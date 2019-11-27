@@ -39,7 +39,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	public void enterVar_decl(MiniCParser.Var_declContext ctx) {
 		String varname = getGlobalVarName(ctx);
 		if(isArrayDecl(ctx)) {
-			// Not Implemented
+			System.out.println();
 		}
 		else if(isDeclWithInit(ctx)) {
 			symbolTable.putGlobalVarWithInitVal(varname, Type.INT, initVal(ctx));
@@ -54,7 +54,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	public void enterLocal_decl(MiniCParser.Local_declContext ctx) {			
 		String varname = getLocalVarName(ctx);
 		if(isArrayDecl(ctx)) {
-			// Not Implemented
+			symbolTable.putLocalArray(varname, Type.INT);
 		}
 		else if(isDeclWithInit(ctx)) {
 			symbolTable.putLocalVarWithInitVal(varname, Type.INT, initVal(ctx));
