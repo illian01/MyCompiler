@@ -1,14 +1,6 @@
+int a[3];
 void main() 
 {
-	int i = 0;
-	int sum = 0;
-	int n = 100;
-	
-	while(i <= n)
-	{
-		sum = sum + i;
-		i = i + 1;
-	}
-	
-	print_d(sum);
+	a[2]=3;
+	print_d(a[2]);
 }

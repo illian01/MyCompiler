@@ -35,7 +35,9 @@ public class x86GenListenerHelper {
 	static int initVal(Var_declContext ctx) {
 		return Integer.parseInt(ctx.LITERAL().getText());
 	}
-
+	static int initsize(Var_declContext ctx) {
+		return Integer.parseInt(ctx.getChild(3).getText());
+	}
 	// var_decl	: type_spec IDENT '=' LITERAL ';
 	static boolean isDeclWithInit(Var_declContext ctx) {
 		return ctx.getChildCount() == 5 ;
@@ -167,6 +169,9 @@ public class x86GenListenerHelper {
 	}
 	static int get_intarrayindex(MiniCParser.ExprContext ctx) {
 		return Integer.parseInt(ctx.getChild(2).getChild(0).getText())*4; 
+	}
+	static int get_globalarrayindex(MiniCParser.ExprContext ctx) {
+		return Integer.parseInt(ctx.getChild(2).getChild(0).getText());
 	}
 	
 }

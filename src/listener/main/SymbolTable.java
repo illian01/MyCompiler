@@ -77,6 +77,9 @@ public class SymbolTable {
 		this._lsymtable.put(varname, new VarInfo(type, _localVarID++, _localOffset));
 		_localOffset += 4*size;
 	}
+	void putglobalArray(String varname, Type type){
+		this._gsymtable.put(varname, new VarInfo(type, _globalVarID++));
+	}
 	void putLocalVar(String varname, Type type){
 		this._lsymtable.put(varname, new VarInfo(type, _localVarID++, _localOffset));
 		_localOffset += 4;
@@ -93,7 +96,7 @@ public class SymbolTable {
 	void putGlobalVarWithInitVal(String varname, Type type, int initVar){
 		this._gsymtable.put(varname, new VarInfo(type, _globalVarID++, initVar));
 	}
-	
+
 	void putParams(MiniCParser.ParamsContext params) {
 		for(int i = 0; i < params.param().size(); i++) {
 			String varname = getParamName(params.param(i));
@@ -194,5 +197,8 @@ public class SymbolTable {
 	
 	public boolean isLocalVar(String varname) {
 		return _lsymtable.containsKey(varname);
+	}
+	public boolean isglobalVar(String varname) {
+		return _gsymtable.containsKey(varname);
 	}
 }

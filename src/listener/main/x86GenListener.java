@@ -1,6 +1,7 @@
 package listener.main;
 
 import java.util.Hashtable;
+import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -39,7 +40,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	public void enterVar_decl(MiniCParser.Var_declContext ctx) {
 		String varname = getGlobalVarName(ctx);
 		if(isArrayDecl(ctx)) {
-			System.out.println();
+			symbolTable.putglobalArray(varname, Type.INT);
 		}
 		else if(isDeclWithInit(ctx)) {
 			symbolTable.putGlobalVarWithInitVal(varname, Type.INT, initVal(ctx));
@@ -69,17 +70,20 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	public void exitProgram(MiniCParser.ProgramContext ctx) {
 		String func = "";
 		String var = "";
-		
+		String var_array="";
 		for(int i = 0; i < ctx.getChildCount(); i++) {
 			if(ctx.decl(i).fun_decl() != null)
 				if(newTexts.get(ctx.decl(i)) != null)
 					func += newTexts.get(ctx.decl(i));
 		}
-		
+		List a = ctx.decl(); 
 		for(int i = 0; i < ctx.getChildCount(); i++) {
 			if(ctx.decl(i).var_decl() != null)
-				if(newTexts.get(ctx.decl(i)) != null)
+				if(newTexts.get(ctx.decl(i)) != null && ctx.decl(i).getChild(0).getChildCount()!=6)
 					var += newTexts.get(ctx.decl(i));
+				else if(newTexts.get(ctx.decl(i)) != null && ctx.decl(i).getChild(0).getChildCount()==6){
+					var_array=newTexts.get(ctx.decl(i));
+				}
 		}
 		
 		func = "section .text\n"
@@ -89,9 +93,10 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		
 		var = "section .data\n"
 				+ "format db \"%d\", 10, 0\n"
-				+ var;
-		
-		String str = func + var;
+				+ var+"\n";
+		var_array = "section .bss\n"+
+				var_array;
+		String str = func + var+var_array;
 		newTexts.put(ctx, str);
 		System.out.println(newTexts.get(ctx));
 	}	
@@ -165,7 +170,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		String varname = getGlobalVarName(ctx);
 		String str = "";
 		if(isArrayDecl(ctx)) {
-			// Not Implemented
+			str += varname + " resd " + initsize(ctx) +"\n";
 		}
 		else if(isDeclWithInit(ctx)) {
 			str += varname + " DD " + initVal(ctx) + "\n";
@@ -257,7 +262,8 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			newTexts.put(ctx, ""); 
 			return;
 		}
-		if(ctx.getChildCount() == 1) { // IDENT | LITERAL
+		if(ctx.getChildCount() == 1&& !symbolTable.isglobalVar(ctx.getParent().getChild(0).getText())) { // IDENT | LITERAL
+			//if(ctx.getParent().getChild(0).getText())
 			if(ctx.IDENT() != null) {
 				String varname = ctx.getChild(0).getText();
 				if(symbolTable.isLocalVar(varname))
@@ -265,7 +271,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				else
 					expr += "mov eax, [" + varname + "]\n";
 			} 
-			else if (ctx.LITERAL() != null) {
+			else if (ctx.LITERAL() != null ){
 				expr += "mov eax, " + ctx.LITERAL().getText() + "\n";
 			}
 		}
@@ -289,17 +295,45 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		else if(ctx.getChildCount() == 4) {
 			if(ctx.args() != null){		// function calls
 				expr = handleFunCall(ctx, expr);
-			} else { // expr
+			} 
+			else if(symbolTable.isglobalVar(ctx.getChild(0).getText())) { // expr
+				String varname = ctx.getChild(0).getText();
+				int index =get_globalarrayindex(ctx)*4;
+				if(index==0) {
+					expr+="mov eax , dword ["+varname+"] \n";
+				}
+				else {
+					expr+="mov eax , dword ["+varname+"+"+ index+"] \n";
+				}
+			}
+			else{
 				String varname = ctx.getChild(0).getText();
 				int offset = symbolTable.getLocalOffset(varname)+ get_intarrayindex(ctx);
 				expr += "mov eax, dword [esp + " +offset+"]\n";
 			}
 		}
+		
 		// IDENT '[' expr ']' '=' expr
 		else { // Arrays: TODO			
-			String varname = ctx.getChild(0).getText();
-			int offset = symbolTable.getLocalOffset(varname)+ get_intarrayindex(ctx);
-			expr += "mov dword [esp + " +offset+"], "+get_operand(ctx)+"\n";
+			if(!symbolTable.isglobalVar(ctx.getParent().getChild(0).getText())) {
+				String varname = ctx.getChild(0).getText();
+				if(symbolTable.isglobalVar(varname)) {
+					int index =get_globalarrayindex(ctx)*4;
+					int operand = get_operand(ctx);
+					if(index==0) {
+						expr+="mov dword ["+varname+"] , "+operand+"\n";
+					}
+					else {
+						expr+="mov dword ["+varname+"+"+ index+"] , "+operand+"\n";
+					}
+				}
+				else{
+					int offset = symbolTable.getLocalOffset(varname)+ get_intarrayindex(ctx);
+					expr += "mov dword [esp + " +offset+"], "+get_operand(ctx)+"\n";
+				}
+				
+			}
+			
 		}
 		newTexts.put(ctx, expr);
 	}
