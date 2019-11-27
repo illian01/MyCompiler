@@ -54,7 +54,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	public void enterLocal_decl(MiniCParser.Local_declContext ctx) {			
 		String varname = getLocalVarName(ctx);
 		if(isArrayDecl(ctx)) {
-			symbolTable.putLocalArray(varname, Type.INT);
+			symbolTable.putLocalArray(varname, Type.INT,get_localArraysize(ctx));
 		}
 		else if(isDeclWithInit(ctx)) {
 			symbolTable.putLocalVarWithInitVal(varname, Type.INT, initVal(ctx));
@@ -196,7 +196,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		String varname = getLocalVarName(ctx);
 		String str = "";
 		if(isArrayDecl(ctx)) {
-			// Not Implemented
+			str += "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "]\n";
 		}
 		else if(isDeclWithInit(ctx)) {
 			str += "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], " + initVal(ctx) + "\n";

@@ -73,9 +73,9 @@ public class SymbolTable {
 		_tempVarID = 32;
 		_localOffset = 0;
 	}
-	void putLocalArray(String varname, Type type) {
+	void putLocalArray(String varname, Type type,int size) {
 		this._lsymtable.put(varname, new VarInfo(type, _localVarID++, _localOffset));
-		_localOffset += 4;
+		_localOffset += 4*size;
 	}
 	void putLocalVar(String varname, Type type){
 		this._lsymtable.put(varname, new VarInfo(type, _localVarID++, _localOffset));
