@@ -159,4 +159,7 @@ public class x86GenListenerHelper {
 	static String getCurrentClassName() {
 		return "Test";
 	}
+	static int get_localArraysize(MiniCParser.Local_declContext ctx) {
+		return Integer.parseInt(ctx.getChild(3).getText()); 
+	}
 }
