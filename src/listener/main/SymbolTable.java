@@ -208,4 +208,10 @@ public class SymbolTable {
 		}
 		return false;
 	}
+	public boolean iseachVar(String varname) {
+		if(isLocalVar(varname) || isglobalVar(varname)) {
+			return true;
+		}
+		return false;
+	}
 }
