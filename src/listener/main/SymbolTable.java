@@ -201,4 +201,11 @@ public class SymbolTable {
 	public boolean isglobalVar(String varname) {
 		return _gsymtable.containsKey(varname);
 	}
+	public boolean isglobalArray(MiniCParser.ExprContext ctx) {
+		
+		if (isglobalVar(ctx.getParent().getChild(0).getText())&&ctx.getParent().getChildCount()>=5) {
+			return true;
+		}
+		return false;
+	}
 }

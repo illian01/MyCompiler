@@ -173,5 +173,6 @@ public class x86GenListenerHelper {
 	static int get_globalarrayindex(MiniCParser.ExprContext ctx) {
 		return Integer.parseInt(ctx.getChild(2).getChild(0).getText());
 	}
+
 	
 }
