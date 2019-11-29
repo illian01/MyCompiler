@@ -221,8 +221,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			return;
 		}
 		if (ctx.getChildCount() == 1) { // IDENT | LITERAL
-			// if(ctx.getParent().getChild(0).getText())
-			if (symbolTable.isglobalArray(ctx)) 
+			if (symbolTable.isglobalArray(ctx)) //global array
 			{
 				newTexts.put(ctx, "");
 				return;
@@ -234,7 +233,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 					else
 						expr += "mov eax, [" + varname + "]\n";
 				} else if (ctx.LITERAL() != null) {
-					if (ctx.getChildCount()==1) {
+				if (symbolTable.isglobalVar(ctx.getParent().getChild(0).getText())) {// global a =3;
+					newTexts.put(ctx, ctx.getChild(0).getText());
+					return;
+				}
+					else {
 					expr += "mov eax, " + ctx.LITERAL().getText() + "\n";
 				}
 				}
@@ -242,14 +245,25 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		} else if (ctx.getChildCount() == 2) { // UnaryOperation
 			expr = handleUnaryExpr(ctx, expr);
 		} else if (ctx.getChildCount() == 3) {
-			if (symbolTable.isLocalVar(ctx.getChild(0).getText())) {
+			if (symbolTable.isLocalVar(ctx.getChild(0).getText()) && ctx.getChild(1).getText().contentEquals("=")) {
 				String varname = ctx.getChild(0).getText();
+				if(ctx.getChild(2).getChildCount()>1) {
+					expr+= newTexts.get(ctx.getChild(2))+
+					       "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], eax\n";
+				}
+				else {
 				expr += "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], " + newTexts.get(ctx.getChild(2))
 						+ "\n";
-			} else if (symbolTable.isglobalVar(ctx.getChild(0).getText())) {
+				}
+			} else if (symbolTable.isglobalVar(ctx.getChild(0).getText())&& ctx.getChild(1).getText().equals("=")) {
 				String varname = ctx.getChild(0).getText();
-				expr += "mov dword [" +varname + "], " + newTexts.get(ctx.getChild(2))
-						+ "\n";
+				if(ctx.getChild(2).getChildCount()>1) {
+					expr+= newTexts.get(ctx.getChild(2))+"\n"+"mov dword [" +varname + "], eax\n";
+				}
+				else{
+					expr += "mov dword [" +varname + "], " + newTexts.get(ctx.getChild(2))+ "\n";
+				}
+						
 
 			} else if (ctx.getChild(0).getText().equals("(")) { // '(' expr ')'
 
@@ -286,15 +300,30 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				String varname = ctx.getChild(0).getText();
 				if (symbolTable.isglobalVar(varname)) {
 					int index = get_globalarrayindex(ctx) * 4;
-					int operand = get_operand(ctx);
-					if (index == 0) {
-						expr += "mov dword [" + varname + "] , " + operand + "\n";
-					} else {
-						expr += "mov dword [" + varname + "+" + index + "] , " + operand + "\n";
+					if(ctx.getChild(5).getChildCount()>1) {
+						expr+= newTexts.get(ctx.getChild(5));
+						if (index == 0) {
+							expr += "mov dword [" + varname + "] , eax \n";
+						} else {
+							expr += "mov dword [" + varname + "+" + index + "] , eax \n";
+						}
+					}
+					else{
+						int operand = get_operand(ctx);
+						if (index == 0) {
+							expr += "mov dword [" + varname + "] , "+ operand+" \n";
+						} else {
+							expr += "mov dword [" + varname + "+" + index + "] , "+ operand+"\n";
+						}
 					}
 				} else {
 					int offset = symbolTable.getLocalOffset(varname) + get_intarrayindex(ctx);
+					if(ctx.getChild(5).getChildCount()>1) {
+						expr+= newTexts.get(ctx.getChild(5))+"mov dword [esp + " + offset + "], eax \n";
+					}
+					else {
 					expr += "mov dword [esp + " + offset + "], " + get_operand(ctx) + "\n";
+					}
 				}
 
 			}
