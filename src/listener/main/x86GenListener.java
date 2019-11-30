@@ -32,6 +32,8 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	@Override
 	public void enterFun_decl(MiniCParser.Fun_declContext ctx) {
 		symbolTable.initFunDecl();
+		ParamsContext params = (MiniCParser.ParamsContext) ctx.getChild(3);
+		symbolTable.putParams(params);
 		// Not Implemented
 	}
 
@@ -129,9 +131,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		// Not Implemented
 		String str = "";
 		str += getFunName(ctx) + ":\n";
+		str += "push ebp\n";
+		str += "mov ebp, esp\n";
 		str += "sub esp, " + symbolTable.getTotalLocalOffset() + "\n";
 		str += newTexts.get(ctx.getChild(ctx.getChildCount() - 1));
-		str += "add esp, " + symbolTable.getTotalLocalOffset() + "\n";
+		str += "leave\n";
 		str += "ret\n\n";
 
 		newTexts.put(ctx, str);
@@ -209,6 +213,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	// return_stmt : RETURN ';' | RETURN expr ';'
 	@Override
 	public void exitReturn_stmt(MiniCParser.Return_stmtContext ctx) {
+		newTexts.put(ctx, newTexts.get(ctx.expr()));
 		// Not Implemented
 	}
 
@@ -230,8 +235,10 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 					String varname = ctx.getChild(0).getText();
 					if (symbolTable.isLocalVar(varname))
 						expr += "mov eax, dword [esp + " + symbolTable.getLocalOffset(varname) + "]\n";
+					else if( symbolTable.isargVar(varname))
+						expr += "mov eax, [ebp + " + symbolTable.getargOffset(varname) + "]\n";
 					else
-						expr += "mov eax, [" + varname + "]\n";
+						expr += "Not found var\n";
 				} else if (ctx.LITERAL() != null) {
 				if (symbolTable.isglobalVar(ctx.getParent().getChild(0).getText())
 						&&ctx.getParent().getChild(1).getText().equals("=")) {// global a =3;	
@@ -513,8 +520,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	private String handleFunCall(MiniCParser.ExprContext ctx, String expr) {
 		String funName = getFunName(ctx);
 		if (funName.equals("print_d")) {
-			expr = newTexts.get(ctx.args()) + "push dword eax\n" + "push dword format\n" + "call printf\n"
-					+ "add esp, 8\n";
+			expr = newTexts.get(ctx.args()) + "push dword eax\n" + "push dword format\n" + "call printf\n";
 		}
 		return expr;
 	}
