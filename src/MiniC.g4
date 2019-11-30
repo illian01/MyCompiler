@@ -33,33 +33,37 @@ if_stmt		: IF '(' expr ')' stmt
 		| IF '(' expr ')' stmt ELSE stmt 		;
 return_stmt	: RETURN ';'			
 		| RETURN expr ';'				;
-expr	:  LITERAL				
-	| '(' expr ')'				 
-	| IDENT				 
-	| IDENT '[' expr ']'			 
-	| IDENT '(' args ')'			
-	| '-' expr				 
-	| '+' expr				 
-	| '--' expr				 
-	| '++' expr				 
-	| expr '*' expr				 
-	| expr '/' expr				 
-	| expr '%' expr				 
-	| expr '+' expr				 
-	| expr '-' expr				 
-	| expr EQ expr				
-	| expr NE expr				 
-	| expr LE expr				 
-	| expr '<' expr				 
-	| expr GE expr				 
-	| expr '>' expr				 
-	| '!' expr					 
-	| expr AND expr				 
-	| expr OR expr				
-	| IDENT '=' expr			
+expr	:
+	| LITERAL
+	| STRING
+	| '(' expr ')'
+	| IDENT
+	| IDENT '[' expr ']'
+	| IDENT '(' args ')'
+	| '-' expr
+	| '+' expr
+	| '--' expr
+	| '++' expr
+	| expr '*' expr
+	| expr '/' expr
+	| expr '%' expr
+	| expr '+' expr
+	| expr '-' expr
+	| expr EQ expr
+	| expr NE expr
+	| expr LE expr
+	| expr '<' expr
+	| expr GE expr
+	| expr '>' expr
+	| '!' expr
+	| expr AND expr
+	| expr OR expr
+	| IDENT '=' expr
 	| IDENT '[' expr ']' '=' expr		;
-args	: expr (',' expr)*			 
+args	: expr (',' expr)*
+	|
 	|					 ;
+
 
 VOID: 'void';
 INT: 'int';
@@ -80,6 +84,16 @@ IDENT  : [a-zA-Z_]
         |  [0-9]
         )*;
 
+STRING  : '"'
+        ( [a-zA-Z_]
+        |  [0-9]
+        | '%d'
+        | '\n'
+        )([a-zA-Z_]
+        |  [0-9]
+        | '%d'
+        | ' '
+        )*'"';
 
 LITERAL:   DecimalConstant     |   OctalConstant     |   HexadecimalConstant     ;
 
