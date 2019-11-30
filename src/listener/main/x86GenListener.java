@@ -211,6 +211,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	// return_stmt : RETURN ';' | RETURN expr ';'
 	@Override
 	public void exitReturn_stmt(MiniCParser.Return_stmtContext ctx) {
+		newTexts.put(ctx, newTexts.get(ctx.expr()));
 		// Not Implemented
 	}
 
