@@ -32,6 +32,8 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	@Override
 	public void enterFun_decl(MiniCParser.Fun_declContext ctx) {
 		symbolTable.initFunDecl();
+		ParamsContext params = (MiniCParser.ParamsContext) ctx.getChild(3);
+		symbolTable.putParams(params);
 		// Not Implemented
 	}
 
@@ -233,8 +235,10 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 					String varname = ctx.getChild(0).getText();
 					if (symbolTable.isLocalVar(varname))
 						expr += "mov eax, dword [esp + " + symbolTable.getLocalOffset(varname) + "]\n";
+					else if( symbolTable.isargVar(varname))
+						expr += "mov eax, [ebp + " + symbolTable.getargOffset(varname) + "]\n";
 					else
-						expr += "mov eax, [" + varname + "]\n";
+						expr += "Not found var\n";
 				} else if (ctx.LITERAL() != null) {
 				if (symbolTable.isglobalVar(ctx.getParent().getChild(0).getText())
 						&&ctx.getParent().getChild(1).getText().equals("=")) {// global a =3;	
