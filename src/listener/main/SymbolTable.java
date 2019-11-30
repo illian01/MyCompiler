@@ -56,7 +56,7 @@ public class SymbolTable {
 	private Map<String, FInfo> _fsymtable = new HashMap<>();	// function 
 	
 	private int _localOffset = 0;
-	private int _argOffset = 4;
+	private int _argOffset = 8;
 		
 	private int _globalVarID = 0;
 	private int _localVarID = 0;
