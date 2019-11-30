@@ -377,16 +377,20 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			expr += "imul eax, ebx\n";
 			break;
 		case "/":
+			expr += expr1;
+			expr += "mov ebx, eax\n";
 			expr += expr2;
 			expr += "mov ecx, eax\n";
-			expr += expr1;
+			expr += "mov eax, ebx\n";
 			expr += "mov edx, 0\n";
 			expr += "div ecx\n";
 			break;
 		case "%":
+			expr += expr1;
+			expr += "mov ebx, eax\n";
 			expr += expr2;
 			expr += "mov ecx, eax\n";
-			expr += expr1;
+			expr += "mov eax, ebx\n";
 			expr += "mov edx, 0\n";
 			expr += "div ecx\n";
 			expr += "mov eax, edx\n";
@@ -398,15 +402,19 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			expr += "add eax, ebx\n";
 			break;
 		case "-":
+			expr += expr1;
+			expr += "mov ecx, eax\n";
 			expr += expr2;
 			expr += "mov ebx, eax\n";
-			expr += expr1;
+			expr += "mov eax, ecx\n";
 			expr += "sub eax, ebx\n";
 			break;
 		case "==":
+			expr += expr1;
+			expr += "mov ecx, eax\n";
 			expr += expr2;
 			expr += "mov ebx, eax\n";
-			expr += expr1;
+			expr += "mov eax, ecx\n";
 			expr += "cmp eax, ebx\n";
 			expr += "je " + l2 + "\n";
 			expr += "mov eax, 0\n";
@@ -416,9 +424,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			expr += lend + ":\n";
 			break;
 		case "!=":
+			expr += expr1;
+			expr += "mov ecx, eax\n";
 			expr += expr2;
 			expr += "mov ebx, eax\n";
-			expr += expr1;
+			expr += "mov eax, ecx\n";
 			expr += "cmp eax, ebx\n";
 			expr += "jne " + l2 + "\n";
 			expr += "mov eax, 0\n";
@@ -428,9 +438,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			expr += lend + ":\n";
 			break;
 		case "<=":
+			expr += expr1;
+			expr += "mov ecx, eax\n";
 			expr += expr2;
 			expr += "mov ebx, eax\n";
-			expr += expr1;
+			expr += "mov eax, ecx\n";
 			expr += "cmp eax, ebx\n";
 			expr += "jle " + l2 + "\n";
 			expr += "mov eax, 0\n";
@@ -440,9 +452,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			expr += lend + ":\n";
 			break;
 		case "<":
+			expr += expr1;
+			expr += "mov ecx, eax\n";
 			expr += expr2;
 			expr += "mov ebx, eax\n";
-			expr += expr1;
+			expr += "mov eax, ecx\n";
 			expr += "cmp eax, ebx\n";
 			expr += "jl " + l2 + "\n";
 			expr += "mov eax, 0\n";
@@ -452,9 +466,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			expr += lend + ":\n";
 			break;
 		case ">=":
+			expr += expr1;
+			expr += "mov ecx, eax\n";
 			expr += expr2;
 			expr += "mov ebx, eax\n";
-			expr += expr1;
+			expr += "mov eax, ecx\n";
 			expr += "cmp eax, ebx\n";
 			expr += "jge " + l2 + "\n";
 			expr += "mov eax, 0\n";
@@ -464,9 +480,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			expr += lend + ":\n";
 			break;
 		case ">":
+			expr += expr1;
+			expr += "mov ecx, eax\n";
 			expr += expr2;
 			expr += "mov ebx, eax\n";
-			expr += expr1;
+			expr += "mov eax, ecx\n";
 			expr += "cmp eax, ebx\n";
 			expr += "jg " + l2 + "\n";
 			expr += "mov eax, 0\n";
