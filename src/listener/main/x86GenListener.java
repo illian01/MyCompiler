@@ -529,9 +529,16 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	@Override
 	public void exitArgs(MiniCParser.ArgsContext ctx) {
 		String argsStr = "";
-
 		for (int i = 0; i < ctx.expr().size(); i++) {
-			argsStr += newTexts.get(ctx.expr(i));
+			String target_arg = ctx.expr(i).getText();
+			System.out.println(target_arg);
+			if( isNumeric(ctx.expr(i).getText()) )
+				argsStr += "push " + Integer.parseInt(target_arg) +"\n";
+			else if( symbolTable.isLocalVar(target_arg) )
+				argsStr += "push dword [esp + " + symbolTable.getLocalOffset(target_arg) + "]\n";
+			else
+				argsStr = newTexts.get(ctx.expr(i));
+
 		}
 		newTexts.put(ctx, argsStr);
 	}
