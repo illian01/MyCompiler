@@ -181,7 +181,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		if (isArrayDecl(ctx)) {
 			// not essential
 		} else if (isDeclWithInit(ctx)) {
-			str += "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], " + initVal(ctx) + "\n";
+			str += "mov dword [ebp - " + symbolTable.getLocalOffset(varname) + "], " + initVal(ctx) + "\n";
 		} else {
 
 		}
@@ -232,56 +232,56 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				return;
 			}
 			else if (ctx.IDENT() != null) {
-					String varname = ctx.getChild(0).getText();
-					if (symbolTable.isLocalVar(varname))
-						expr += "mov eax, dword [esp + " + symbolTable.getLocalOffset(varname) + "]\n";
-					else if( symbolTable.isargVar(varname))
-						expr += "mov eax, [ebp + " + symbolTable.getargOffset(varname) + "]\n";
-					else
-						expr += "Not found var\n";
-				} else if (ctx.LITERAL() != null) {
+				String varname = ctx.getChild(0).getText();
+				if (symbolTable.isLocalVar(varname))
+					expr += "mov eax, dword [ebp - " + symbolTable.getLocalOffset(varname) + "]\n";
+				else if( symbolTable.isargVar(varname))
+					expr += "mov eax, [ebp + " + symbolTable.getargOffset(varname) + "]\n";
+				else
+					expr += "Not found var\n";
+			} else if (ctx.LITERAL() != null) {
 				if (symbolTable.isglobalVar(ctx.getParent().getChild(0).getText())
-						&&ctx.getParent().getChild(1).getText().equals("=")) {// global a =3;	
-						newTexts.put(ctx, ctx.getChild(0).getText());
-						return;
-									
+						&&ctx.getParent().getChild(1).getText().equals("=")) {// global a =3;
+					newTexts.put(ctx, ctx.getChild(0).getText());
+					return;
+
 				}
 				else {
 					expr += "mov eax, " + ctx.LITERAL().getText() + "\n";
 				}
-				}
-		
+			}
+
 		} else if (ctx.getChildCount() == 2) { // UnaryOperation
 			expr = handleUnaryExpr(ctx, expr);
 		} else if (ctx.getChildCount() == 3) {
 			if (symbolTable.isLocalVar(ctx.getChild(0).getText()) && ctx.getChild(1).getText().contentEquals("=")) {
 				String varname = ctx.getChild(0).getText();
-				if(ctx.getChild(2).getChildCount()>1 || 
+				if(ctx.getChild(2).getChildCount()>1 ||
 						(ctx.getChild(2).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(2).getText()))) {
 					expr+= newTexts.get(ctx.getChild(2))+
-					       "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], eax\n";
+							"mov dword [ebp - " + symbolTable.getLocalOffset(varname) + "], eax\n";
 				}
 				else {
-				expr += "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], " + newTexts.get(ctx.getChild(2))
-						+ "\n";
+					expr += "mov dword [ebp - " + symbolTable.getLocalOffset(varname) + "], " + newTexts.get(ctx.getChild(2))
+							+ "\n";
 				}
 			} else if (symbolTable.isglobalVar(ctx.getChild(0).getText())&& ctx.getChild(1).getText().equals("=")) {
 				String varname = ctx.getChild(0).getText();
-				if(ctx.getChild(2).getChildCount()>1 || 
+				if(ctx.getChild(2).getChildCount()>1 ||
 						(ctx.getChild(2).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(2).getText()))) {
 					expr+= newTexts.get(ctx.getChild(2))+"\n"+"mov dword [" +varname + "], eax\n";
 				}
 				else{
 					expr += "mov dword [" +varname + "], " + newTexts.get(ctx.getChild(2))+ "\n";
 				}
-						
+
 
 			} else if (ctx.getChild(0).getText().equals("(")) { // '(' expr ')'
 
 			} else if (ctx.getChild(1).getText().equals("=")) { // IDENT '=' expr
 				String varname = ctx.getChild(0).getText();
 				expr += newTexts.get(ctx.getChild(2));
-				expr += "mov dword [esp + " + symbolTable.getLocalOffset(varname) + "], eax\n";
+				expr += "mov dword [ebp - " + symbolTable.getLocalOffset(varname) + "], eax\n";
 			} else { // binary operation
 				expr = handleBinExpr(ctx, expr);
 			}
@@ -301,7 +301,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			} else {
 				String varname = ctx.getChild(0).getText();
 				int offset = symbolTable.getLocalOffset(varname) + get_intarrayindex(ctx);
-				expr += "mov eax, dword [esp + " + offset + "]\n";
+				expr += "mov eax, dword [ebp - " + offset + "]\n";
 			}
 		}
 
@@ -312,7 +312,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				if (symbolTable.isglobalVar(varname)) {
 					int index = get_globalarrayindex(ctx) * 4;
 					if(ctx.getChild(5).getChildCount()>1
-						|| (ctx.getChild(5).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(5).getText()))) {
+							|| (ctx.getChild(5).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(5).getText()))) {
 						expr+= newTexts.get(ctx.getChild(5));
 						if (index == 0) {
 							expr += "mov dword [" + varname + "] , eax \n";
@@ -331,11 +331,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				} else {
 					int offset = symbolTable.getLocalOffset(varname) + get_intarrayindex(ctx);
 					if(ctx.getChild(5).getChildCount()>1
-					|| (ctx.getChild(5).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(5).getText()))) {
-						expr+= newTexts.get(ctx.getChild(5))+"mov dword [esp + " + offset + "], eax \n";
+							|| (ctx.getChild(5).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(5).getText()))) {
+						expr+= newTexts.get(ctx.getChild(5))+"mov dword [ebp - " + offset + "], eax \n";
 					}
 					else {
-					expr += "mov dword [esp + " + offset + "], " + get_operand(ctx) + "\n";
+						expr += "mov dword [ebp - " + offset + "], " + get_operand(ctx) + "\n";
 					}
 				}
 
@@ -352,19 +352,19 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 
 		expr += newTexts.get(ctx.expr(0));
 		switch (ctx.getChild(0).getText()) {
-		case "-":
-			expr += "neg eax\n";
-			break;
-		case "--":
-			expr += "dec eax\n";
-			break;
-		case "++":
-			expr += "inc eax\n";
-			break;
-		case "!":
-			expr += "cmp eax, 0\n" + "je " + l2 + "\n" + l1 + ":\n" + "mov eax, 0\n" + "jmp " + lend + "\n" + l2 + ":\n"
-					+ "mov eax, 1\n" + lend + ":\n";
-			break;
+			case "-":
+				expr += "neg eax\n";
+				break;
+			case "--":
+				expr += "dec eax\n";
+				break;
+			case "++":
+				expr += "inc eax\n";
+				break;
+			case "!":
+				expr += "cmp eax, 0\n" + "je " + l2 + "\n" + l1 + ":\n" + "mov eax, 0\n" + "jmp " + lend + "\n" + l2 + ":\n"
+						+ "mov eax, 1\n" + lend + ":\n";
+				break;
 		}
 		return expr;
 	}
@@ -377,141 +377,141 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		String expr2 = newTexts.get(ctx.expr(1));
 
 		switch (ctx.getChild(1).getText()) {
-		case "*":
-			expr += expr1;
-			expr += "mov ebx, eax\n";
-			expr += expr2;
-			expr += "imul eax, ebx\n";
-			break;
-		case "/":
-			expr += expr1;
-			expr += "mov ebx, eax\n";
-			expr += expr2;
-			expr += "mov ecx, eax\n";
-			expr += "mov eax, ebx\n";
-			expr += "mov edx, 0\n";
-			expr += "div ecx\n";
-			break;
-		case "%":
-			expr += expr1;
-			expr += "mov ebx, eax\n";
-			expr += expr2;
-			expr += "mov ecx, eax\n";
-			expr += "mov eax, ebx\n";
-			expr += "mov edx, 0\n";
-			expr += "div ecx\n";
-			expr += "mov eax, edx\n";
-			break;
-		case "+": // expr(0) expr(1) iadd
-			expr += expr1;
-			expr += "mov ebx, eax\n";
-			expr += expr2;
-			expr += "add eax, ebx\n";
-			break;
-		case "-":
-			expr += expr1;
-			expr += "mov ecx, eax\n";
-			expr += expr2;
-			expr += "mov ebx, eax\n";
-			expr += "mov eax, ecx\n";
-			expr += "sub eax, ebx\n";
-			break;
-		case "==":
-			expr += expr1;
-			expr += "mov ecx, eax\n";
-			expr += expr2;
-			expr += "mov ebx, eax\n";
-			expr += "mov eax, ecx\n";
-			expr += "cmp eax, ebx\n";
-			expr += "je " + l2 + "\n";
-			expr += "mov eax, 0\n";
-			expr += "jmp " + lend + "\n";
-			expr += l2 + ":\n";
-			expr += "mov eax, 1\n";
-			expr += lend + ":\n";
-			break;
-		case "!=":
-			expr += expr1;
-			expr += "mov ecx, eax\n";
-			expr += expr2;
-			expr += "mov ebx, eax\n";
-			expr += "mov eax, ecx\n";
-			expr += "cmp eax, ebx\n";
-			expr += "jne " + l2 + "\n";
-			expr += "mov eax, 0\n";
-			expr += "jmp " + lend + "\n";
-			expr += l2 + ":\n";
-			expr += "mov eax, 1\n";
-			expr += lend + ":\n";
-			break;
-		case "<=":
-			expr += expr1;
-			expr += "mov ecx, eax\n";
-			expr += expr2;
-			expr += "mov ebx, eax\n";
-			expr += "mov eax, ecx\n";
-			expr += "cmp eax, ebx\n";
-			expr += "jle " + l2 + "\n";
-			expr += "mov eax, 0\n";
-			expr += "jmp " + lend + "\n";
-			expr += l2 + ":\n";
-			expr += "mov eax, 1\n";
-			expr += lend + ":\n";
-			break;
-		case "<":
-			expr += expr1;
-			expr += "mov ecx, eax\n";
-			expr += expr2;
-			expr += "mov ebx, eax\n";
-			expr += "mov eax, ecx\n";
-			expr += "cmp eax, ebx\n";
-			expr += "jl " + l2 + "\n";
-			expr += "mov eax, 0\n";
-			expr += "jmp " + lend + "\n";
-			expr += l2 + ":\n";
-			expr += "mov eax, 1\n";
-			expr += lend + ":\n";
-			break;
-		case ">=":
-			expr += expr1;
-			expr += "mov ecx, eax\n";
-			expr += expr2;
-			expr += "mov ebx, eax\n";
-			expr += "mov eax, ecx\n";
-			expr += "cmp eax, ebx\n";
-			expr += "jge " + l2 + "\n";
-			expr += "mov eax, 0\n";
-			expr += "jmp " + lend + "\n";
-			expr += l2 + ":\n";
-			expr += "mov eax, 1\n";
-			expr += lend + ":\n";
-			break;
-		case ">":
-			expr += expr1;
-			expr += "mov ecx, eax\n";
-			expr += expr2;
-			expr += "mov ebx, eax\n";
-			expr += "mov eax, ecx\n";
-			expr += "cmp eax, ebx\n";
-			expr += "jg " + l2 + "\n";
-			expr += "mov eax, 0\n";
-			expr += "jmp " + lend + "\n";
-			expr += l2 + ":\n";
-			expr += "mov eax, 1\n";
-			expr += lend + ":\n";
-			break;
-		case "and":
-			expr += expr1;
-			expr += "mov ebx, eax\n";
-			expr += expr2;
-			expr += "and eax, ebx\n";
-			break;
-		case "or":
-			expr += expr1;
-			expr += "mov ebx, eax\n";
-			expr += expr2;
-			expr += "or eax, ebx\n";
-			break;
+			case "*":
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "imul eax, ebx\n";
+				break;
+			case "/":
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "mov ecx, eax\n";
+				expr += "mov eax, ebx\n";
+				expr += "mov edx, 0\n";
+				expr += "div ecx\n";
+				break;
+			case "%":
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "mov ecx, eax\n";
+				expr += "mov eax, ebx\n";
+				expr += "mov edx, 0\n";
+				expr += "div ecx\n";
+				expr += "mov eax, edx\n";
+				break;
+			case "+": // expr(0) expr(1) iadd
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "add eax, ebx\n";
+				break;
+			case "-":
+				expr += expr1;
+				expr += "mov ecx, eax\n";
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += "mov eax, ecx\n";
+				expr += "sub eax, ebx\n";
+				break;
+			case "==":
+				expr += expr1;
+				expr += "mov ecx, eax\n";
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += "mov eax, ecx\n";
+				expr += "cmp eax, ebx\n";
+				expr += "je " + l2 + "\n";
+				expr += "mov eax, 0\n";
+				expr += "jmp " + lend + "\n";
+				expr += l2 + ":\n";
+				expr += "mov eax, 1\n";
+				expr += lend + ":\n";
+				break;
+			case "!=":
+				expr += expr1;
+				expr += "mov ecx, eax\n";
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += "mov eax, ecx\n";
+				expr += "cmp eax, ebx\n";
+				expr += "jne " + l2 + "\n";
+				expr += "mov eax, 0\n";
+				expr += "jmp " + lend + "\n";
+				expr += l2 + ":\n";
+				expr += "mov eax, 1\n";
+				expr += lend + ":\n";
+				break;
+			case "<=":
+				expr += expr1;
+				expr += "mov ecx, eax\n";
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += "mov eax, ecx\n";
+				expr += "cmp eax, ebx\n";
+				expr += "jle " + l2 + "\n";
+				expr += "mov eax, 0\n";
+				expr += "jmp " + lend + "\n";
+				expr += l2 + ":\n";
+				expr += "mov eax, 1\n";
+				expr += lend + ":\n";
+				break;
+			case "<":
+				expr += expr1;
+				expr += "mov ecx, eax\n";
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += "mov eax, ecx\n";
+				expr += "cmp eax, ebx\n";
+				expr += "jl " + l2 + "\n";
+				expr += "mov eax, 0\n";
+				expr += "jmp " + lend + "\n";
+				expr += l2 + ":\n";
+				expr += "mov eax, 1\n";
+				expr += lend + ":\n";
+				break;
+			case ">=":
+				expr += expr1;
+				expr += "mov ecx, eax\n";
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += "mov eax, ecx\n";
+				expr += "cmp eax, ebx\n";
+				expr += "jge " + l2 + "\n";
+				expr += "mov eax, 0\n";
+				expr += "jmp " + lend + "\n";
+				expr += l2 + ":\n";
+				expr += "mov eax, 1\n";
+				expr += lend + ":\n";
+				break;
+			case ">":
+				expr += expr1;
+				expr += "mov ecx, eax\n";
+				expr += expr2;
+				expr += "mov ebx, eax\n";
+				expr += "mov eax, ecx\n";
+				expr += "cmp eax, ebx\n";
+				expr += "jg " + l2 + "\n";
+				expr += "mov eax, 0\n";
+				expr += "jmp " + lend + "\n";
+				expr += l2 + ":\n";
+				expr += "mov eax, 1\n";
+				expr += lend + ":\n";
+				break;
+			case "and":
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "and eax, ebx\n";
+				break;
+			case "or":
+				expr += expr1;
+				expr += "mov ebx, eax\n";
+				expr += expr2;
+				expr += "or eax, ebx\n";
+				break;
 
 		}
 		return expr;
@@ -535,7 +535,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			if( isNumeric(ctx.expr(i).getText()) )
 				argsStr += "push " + Integer.parseInt(target_arg) +"\n";
 			else if( symbolTable.isLocalVar(target_arg) )
-				argsStr += "push dword [esp + " + symbolTable.getLocalOffset(target_arg) + "]\n";
+				argsStr += "push dword [ebp - " + symbolTable.getLocalOffset(target_arg) + "]\n";
 			else
 				argsStr = newTexts.get(ctx.expr(i));
 
