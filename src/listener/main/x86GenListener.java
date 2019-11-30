@@ -129,9 +129,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		// Not Implemented
 		String str = "";
 		str += getFunName(ctx) + ":\n";
+		str += "push ebp\n";
+		str += "mov ebp, esp\n";
 		str += "sub esp, " + symbolTable.getTotalLocalOffset() + "\n";
 		str += newTexts.get(ctx.getChild(ctx.getChildCount() - 1));
-		str += "add esp, " + symbolTable.getTotalLocalOffset() + "\n";
+		str += "leave\n";
 		str += "ret\n\n";
 
 		newTexts.put(ctx, str);
@@ -513,8 +515,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	private String handleFunCall(MiniCParser.ExprContext ctx, String expr) {
 		String funName = getFunName(ctx);
 		if (funName.equals("print_d")) {
-			expr = newTexts.get(ctx.args()) + "push dword eax\n" + "push dword format\n" + "call printf\n"
-					+ "add esp, 8\n";
+			expr = newTexts.get(ctx.args()) + "push dword eax\n" + "push dword format\n" + "call printf\n";
 		}
 		return expr;
 	}
