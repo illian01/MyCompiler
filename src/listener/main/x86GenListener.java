@@ -135,8 +135,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		str += "mov ebp, esp\n";
 		str += "sub esp, " + symbolTable.getTotalLocalOffset() + "\n";
 		str += newTexts.get(ctx.getChild(ctx.getChildCount() - 1));
-		str += "leave\n";
-		str += "ret\n\n";
+		if( getFReturnType(ctx).equals("V") ) {
+			str += "leave\n";
+			str += "ret\n\n";
+		}
+
 
 		newTexts.put(ctx, str);
 	}
@@ -213,7 +216,10 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	// return_stmt : RETURN ';' | RETURN expr ';'
 	@Override
 	public void exitReturn_stmt(MiniCParser.Return_stmtContext ctx) {
-		newTexts.put(ctx, newTexts.get(ctx.expr()));
+		String ret = newTexts.get(ctx.expr());
+		ret += "leave\n";
+		ret += "ret\n\n";
+		newTexts.put(ctx, ret );
 		// Not Implemented
 	}
 
@@ -520,7 +526,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	private String handleFunCall(MiniCParser.ExprContext ctx, String expr) {
 		String funName = getFunName(ctx);
 		if (funName.equals("print_d")) {
-			expr = newTexts.get(ctx.args()) + "push dword eax\n" + "push dword format\n" + "call printf\n";
+			expr = newTexts.get(ctx.args()) + "push dword format\n" + "call printf\n";
 		}
 		else{
 
@@ -537,13 +543,14 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		String argsStr = "";
 		for (int i = 0; i < ctx.expr().size(); i++) {
 			String target_arg = ctx.expr(i).getText();
-			System.out.println(target_arg);
 			if( isNumeric(ctx.expr(i).getText()) )
 				argsStr += "push " + Integer.parseInt(target_arg) +"\n";
 			else if( symbolTable.isLocalVar(target_arg) )
 				argsStr += "push dword [ebp - " + symbolTable.getLocalOffset(target_arg) + "]\n";
-			else
+			else {
 				argsStr = newTexts.get(ctx.expr(i));
+				argsStr += "push dword eax\n";
+			}
 
 		}
 		newTexts.put(ctx, argsStr);
