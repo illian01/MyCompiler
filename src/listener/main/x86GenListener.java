@@ -537,7 +537,6 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		String argsStr = "";
 		for (int i = 0; i < ctx.expr().size(); i++) {
 			String target_arg = ctx.expr(i).getText();
-			System.out.println(target_arg);
 			if( isNumeric(ctx.expr(i).getText()) )
 				argsStr += "push " + Integer.parseInt(target_arg) +"\n";
 			else if( symbolTable.isLocalVar(target_arg) )
