@@ -181,6 +181,22 @@ public class x86GenListenerHelper {
 			return false;
 		}
 	}
-
+    static String getkey(String str){
+	    String[] strip = str.split(" ");
+        String stripstring = "";
+        for( String a : strip )
+            stripstring += a;
+        str = stripstring;
+        if(isNumeric(str)) {
+            return "str" + str;
+        }
+        else {
+            return str;
+        }
+    }
+    static String tripString(String str){
+        String[] split = str.split("\"");
+        return split[1];
+    }
 	
 }

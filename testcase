@@ -44,6 +44,9 @@ void main()
         print_d( f(n) );
 }
 
-
+void main()
+{
+	printf("Hello Compiler");
+}
 
 
