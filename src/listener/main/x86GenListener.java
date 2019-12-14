@@ -133,9 +133,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		str += getFunName(ctx) + ":\n";
 		str += "push ebp\n";
 		str += "mov ebp, esp\n";
+		str += "push ebx\n";
 		str += "sub esp, " + symbolTable.getTotalLocalOffset() + "\n";
 		str += newTexts.get(ctx.getChild(ctx.getChildCount() - 1));
 		if( getFReturnType(ctx).equals("V") ) {
+			str += "mov ebx, dword[ebp - 4]\n";
 			str += "leave\n";
 			str += "ret\n\n";
 		}
@@ -217,6 +219,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	@Override
 	public void exitReturn_stmt(MiniCParser.Return_stmtContext ctx) {
 		String ret = newTexts.get(ctx.expr());
+		ret += "mov ebx, dword[ebp - 4]\n";
 		ret += "leave\n";
 		ret += "ret\n\n";
 		newTexts.put(ctx, ret );
@@ -417,10 +420,15 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			case "-":
 				expr += expr1;
 				expr += "mov ecx, eax\n";
-				expr += expr2;
-				expr += "mov ebx, eax\n";
-				expr += "mov eax, ecx\n";
-				expr += "sub eax, ebx\n";
+				if (isNumeric(ctx.expr(1).getText())) {
+					expr += "sub eax, "+ctx.expr(1).getText()+"\n";
+				}
+				else{
+					expr += expr2;
+					expr += "mov ebx, eax\n";
+					expr += "mov eax, ecx\n";
+					expr += "sub eax, ebx\n";
+				}
 				break;
 			case "==":
 				expr += expr1;
