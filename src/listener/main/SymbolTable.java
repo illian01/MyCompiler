@@ -53,7 +53,8 @@ public class SymbolTable {
 	private Map<String, VarInfo> _lsymtable = new HashMap<>();	// local v.
 	private Map<String, VarInfo> _asymtable = new HashMap<>();	// local v.
 	private Map<String, VarInfo> _gsymtable = new HashMap<>();	// global v.
-	private Map<String, FInfo> _fsymtable = new HashMap<>();	// function 
+	private Map<String, FInfo> _fsymtable = new HashMap<>();	// function
+	private Map<String, String> _ssymtable = new HashMap<>();	// function
 
 	private int _localOffset = 0;
 	private int _argOffset = 8;
@@ -87,6 +88,23 @@ public class SymbolTable {
 		_localOffset += 4;
 		this._lsymtable.put(varname, new VarInfo(type, _localVarID++, _localOffset));
 
+	}
+	void putString(String str){
+			String strip = getkey(str);
+			if(isNumeric(str))
+				this._ssymtable.put(str,"str"+ strip  + " db \"" + str + "\", 10, 0\n");
+			else
+				this._ssymtable.put(str,strip  + " db \"" + str + "\", 10, 0\n");
+	}
+
+
+
+	Map<String, String> getStringTable(){
+		return this._ssymtable;
+	}
+
+	String getString(String str){
+			return this._ssymtable.get(str);
 	}
 
 	void putargVar(String varname, Type type){

@@ -85,7 +85,10 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 
 		func = "section .text\n" + "global main\n" + "extern printf\n\n" + func + "\n\n";
 
-		var = "section .data\n" + "format db \"%d\", 10, 0\n" + var + "\n";
+		var = "section .data\n" + "format db \"%d\", 10, 0\n";
+		for (String key : symbolTable.getStringTable().keySet()){
+			var += symbolTable.getString(key);
+		}
 		var_array = "section .bss\n" + var_array;
 		String str = func + var + var_array;
 		newTexts.put(ctx, str);
@@ -239,6 +242,12 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			{
 				newTexts.put(ctx, "");
 				return;
+			}else if (ctx.STRING() != null){
+				String target = tripString(ctx.getText());
+				symbolTable.putString(target);
+				String key = getkey(target);
+				expr += "mov eax, "+key+"\n";
+
 			}
 			else if (ctx.IDENT() != null) {
 				String varname = ctx.getChild(0).getText();
