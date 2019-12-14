@@ -417,10 +417,15 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			case "-":
 				expr += expr1;
 				expr += "mov ecx, eax\n";
-				expr += expr2;
-				expr += "mov ebx, eax\n";
-				expr += "mov eax, ecx\n";
-				expr += "sub eax, ebx\n";
+				if (isNumeric(ctx.expr(1).getText())) {
+					expr += "sub eax, "+ctx.expr(1).getText()+"\n";
+				}
+				else{
+					expr += expr2;
+					expr += "mov ebx, eax\n";
+					expr += "mov eax, ecx\n";
+					expr += "sub eax, ebx\n";
+				}
 				break;
 			case "==":
 				expr += expr1;
