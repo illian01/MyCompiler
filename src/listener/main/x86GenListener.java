@@ -541,8 +541,10 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				argsStr += "push " + Integer.parseInt(target_arg) +"\n";
 			else if( symbolTable.isLocalVar(target_arg) )
 				argsStr += "push dword [ebp - " + symbolTable.getLocalOffset(target_arg) + "]\n";
-			else
+			else {
 				argsStr = newTexts.get(ctx.expr(i));
+				argsStr += "push dword eax\n";
+			}
 
 		}
 		newTexts.put(ctx, argsStr);
