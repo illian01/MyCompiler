@@ -520,7 +520,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	private String handleFunCall(MiniCParser.ExprContext ctx, String expr) {
 		String funName = getFunName(ctx);
 		if (funName.equals("print_d")) {
-			expr = newTexts.get(ctx.args()) + "push dword eax\n" + "push dword format\n" + "call printf\n";
+			expr = newTexts.get(ctx.args()) + "push dword format\n" + "call printf\n";
 		}
 		else{
 
