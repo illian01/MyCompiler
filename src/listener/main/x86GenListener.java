@@ -135,8 +135,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		str += "mov ebp, esp\n";
 		str += "sub esp, " + symbolTable.getTotalLocalOffset() + "\n";
 		str += newTexts.get(ctx.getChild(ctx.getChildCount() - 1));
-		str += "leave\n";
-		str += "ret\n\n";
+		if( getFReturnType(ctx).equals("V") ) {
+			str += "leave\n";
+			str += "ret\n\n";
+		}
+
 
 		newTexts.put(ctx, str);
 	}
