@@ -1,18 +1,9 @@
 package listener.main;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
-import javax.swing.plaf.synth.SynthSplitPaneUI;
-
 import generated.MiniCParser;
-import generated.MiniCParser.Fun_declContext;
-import generated.MiniCParser.Local_declContext;
-import generated.MiniCParser.ParamsContext;
-import generated.MiniCParser.Type_specContext;
-import generated.MiniCParser.Var_declContext;
-import listener.main.SymbolTable.Type;
 import static listener.main.x86GenListenerHelper.*;
 
 
@@ -130,6 +121,9 @@ public class SymbolTable {
 	// local
 	public int getTotalLocalOffset() {
 		return _localOffset;
+	}
+	public int getTotalargsOffset() {
+		return _argVarID*4;
 	}
 
 	public int getLocalOffset(String varname) {

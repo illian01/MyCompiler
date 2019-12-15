@@ -1,5 +1,10 @@
-void main() 
+int add( int a, int b, int c ){
+    return a + b + c;
+}
+
+void main()
 {
-   printf("%s\t%d ~ 35[2]\n", "abc",5);
+   int n = 5;
+   printf("%d %d %d\n", 5, 3, 2 );
 }
 
