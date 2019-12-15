@@ -188,7 +188,7 @@ public class SymbolTable {
 		}
 		return false;
 	}
-	public boolean iseachVar(String varname) {
+	public boolean is_existVar(String varname) {
 		if(isLocalVar(varname) || isglobalVar(varname)) {
 			return true;
 		}

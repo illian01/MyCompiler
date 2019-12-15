@@ -279,7 +279,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				String varname = ctx.getChild(0).getText();
 				
 				if(ctx.getChild(2).getChildCount()>1 ||
-						(ctx.getChild(2).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(2).getText()))) {
+						(ctx.getChild(2).getChildCount()==1 &&symbolTable.is_existVar(ctx.getChild(2).getText()))) {
 					//로컬 변수에 상수가 아닌값이나 계산식이 올때
 					expr+= newTexts.get(ctx.getChild(2))+
 							"mov dword [ebp - " + symbolTable.getLocalOffset(varname) + "], eax\n";
@@ -295,7 +295,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				String varname = ctx.getChild(0).getText();
 				
 				if(ctx.getChild(2).getChildCount()>1 ||
-						(ctx.getChild(2).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(2).getText()))) {
+						(ctx.getChild(2).getChildCount()==1 &&symbolTable.is_existVar(ctx.getChild(2).getText()))) {
 					//글로벌 변수에 상수가 아닌 값이나 계산식이 들어올때
 					expr+= newTexts.get(ctx.getChild(2))+"\n"+"mov dword [" +varname + "], eax\n";
 				}
@@ -347,7 +347,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 					int index = get_globalarrayindex(ctx) * 4;
 					
 					if(ctx.getChild(5).getChildCount()>1
-							|| (ctx.getChild(5).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(5).getText()))) {
+							|| (ctx.getChild(5).getChildCount()==1 &&symbolTable.is_existVar(ctx.getChild(5).getText()))) {
 						//배열에 변수 혹은 연산식으로 값이 들어올때
 						expr+= newTexts.get(ctx.getChild(5));
 						
@@ -371,7 +371,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 					int offset = symbolTable.getLocalOffset(varname) - get_intarrayindex(ctx);
 					
 					if(ctx.getChild(5).getChildCount()>1  || 
-							(ctx.getChild(5).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(5).getText()))) {
+							(ctx.getChild(5).getChildCount()==1 &&symbolTable.is_existVar(ctx.getChild(5).getText()))) {
 						//배열에 변수 혹은 연산식으로 값이 들어올때
 						expr+= newTexts.get(ctx.getChild(5))+"mov dword [ebp - " + offset + "], eax \n";
 					}
