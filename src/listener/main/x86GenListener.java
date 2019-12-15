@@ -120,8 +120,8 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		String expr = newTexts.get(ctx.expr());
 		String bodystmt = newTexts.get(ctx.stmt());
 
-		String lelse = symbolTable.newLabel();
 		String lend = symbolTable.newLabel();
+		String lelse = symbolTable.newLabel();
 
 		stmt += "jmp " + lelse + "\n" + lend + ": \n" + bodystmt + lelse + ": " + "\n" + expr + "cmp eax, 0\n" + "jne "
 				+ lend + "\n";
@@ -137,10 +137,14 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		str += "push ebp\n";
 		str += "mov ebp, esp\n";
 		str += "push ebx\n";
+		str += "push ecx\n";
+		str += "push edx\n";
 		str += "sub esp, " + symbolTable.getTotalLocalOffset() + "\n";
 		str += newTexts.get(ctx.getChild(ctx.getChildCount() - 1));
 		if( isVoidF(ctx)) {
-			str += "mov ebx, [ ebp - 4 ]\n";
+			str += "pop edx\n";
+			str += "pop ecx\n";
+			str += "pop ebx\n";
 			str += "leave\n";
 			str += "ret\n\n";
 		}
@@ -215,7 +219,9 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	@Override
 	public void exitReturn_stmt(MiniCParser.Return_stmtContext ctx) {
 		String ret = newTexts.get(ctx.expr());
-		ret += "mov ebx, [ ebp - 4 ]\n";
+		ret += "pop edx\n";
+		ret += "pop ecx\n";
+		ret += "pop ebx\n";
 		ret += "leave\n";
 		ret += "ret\n\n";
 		newTexts.put(ctx, ret );
