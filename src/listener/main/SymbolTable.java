@@ -148,30 +148,6 @@ public class SymbolTable {
 		return _fsymtable.get(fname).sigStr;
 	}
 
-	public String getFunSpecStr(Fun_declContext ctx) {
-		return getFunSpecStr(ctx.getChild(1).getText());
-	}
-
-	public String putFunSpecStr(Fun_declContext ctx) {
-		String fname = getFunName(ctx);
-		String argtype = "";
-		String rtype = "";
-		String res = "";
-
-		rtype = getFReturnType(ctx);
-
-		ParamsContext params = (MiniCParser.ParamsContext) ctx.getChild(3);
-		argtype = getParamTypesText(params);
-
-		res =  fname + "(" + argtype + ")" + rtype;
-
-		FInfo finfo = new FInfo();
-		finfo.sigStr = res;
-		_fsymtable.put(fname, finfo);
-
-		return res;
-	}
-
 	String getVarId(String name){
 		if(_lsymtable.containsKey(name))
 			return Integer.toString(_lsymtable.get(name).id);
@@ -180,37 +156,11 @@ public class SymbolTable {
 		return "";
 	}
 
-	Type getVarType(String name){
-		VarInfo lvar = (VarInfo) _lsymtable.get(name);
-		if (lvar != null) {
-			return lvar.type;
-		}
-
-		VarInfo gvar = (VarInfo) _gsymtable.get(name);
-		if (gvar != null) {
-			return gvar.type;
-		}
-
-		return Type.ERROR;
-	}
 	String newLabel() {
 		return "label" + _labelID++;
 	}
 
-	// global
-	public String getVarId(Var_declContext ctx) {
-		// <Fill here>
-		String sname = "";
-		return null;
-	}
-
 	// local
-	public String getVarId(Local_declContext ctx) {
-		String sname = "";
-		sname += getVarId(ctx.IDENT().getText());
-		return sname;
-	}
-
 	public int getTotalLocalOffset() {
 		return _localOffset;
 	}
