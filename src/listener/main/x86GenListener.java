@@ -347,7 +347,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 						}
 					}
 				} else {
-					int offset = symbolTable.getLocalOffset(varname) + get_intarrayindex(ctx);
+					int offset = symbolTable.getLocalOffset(varname) - get_intarrayindex(ctx);
 					if(ctx.getChild(5).getChildCount()>1
 							|| (ctx.getChild(5).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(5).getText()))) {
 						expr+= newTexts.get(ctx.getChild(5))+"mov dword [ebp - " + offset + "], eax \n";
