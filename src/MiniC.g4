@@ -84,15 +84,7 @@ IDENT  : [a-zA-Z_]
         |  [0-9]
         )*;
 
-STRING  : '"'
-        ( [a-zA-Z_]
-        |  [0-9]
-        | '%d'
-        )([a-zA-Z_]
-        |  [0-9]
-        | '%d'
-        | ' '
-        )*'"';
+STRING : '"' (~'"'|'\\"')* '"';
 
 LITERAL:   DecimalConstant     |   OctalConstant     |   HexadecimalConstant     ;
 
