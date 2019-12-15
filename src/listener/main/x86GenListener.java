@@ -66,7 +66,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	@Override
 	public void exitProgram(MiniCParser.ProgramContext ctx) {
 		String func = "";
-		String var = "";
+		String var = "section .data\n" + "format db \"%d\", 10, 0\n";
 		String var_array = "";
 		for (int i = 0; i < ctx.getChildCount(); i++) {
 			if (ctx.decl(i).fun_decl() != null)
@@ -85,7 +85,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 
 		func = "section .text\n" + "global main\n" + "extern printf\n\n" + func + "\n\n";
 
-		var = "section .data\n" + "format db \"%d\", 10, 0\n";
+		
 		for (String key : symbolTable.getStringTable().keySet()){
 			var += symbolTable.getString(key);
 		}
@@ -255,6 +255,8 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 					expr += "mov eax, dword [ebp - " + symbolTable.getLocalOffset(varname) + "]\n";
 				else if( symbolTable.isargVar(varname))
 					expr += "mov eax, [ebp + " + symbolTable.getargOffset(varname) + "]\n";
+				else if (symbolTable.isglobalVar(varname))
+					expr += "mov eax, [ " + varname + " ]\n";
 				else
 					expr += "Not found var\n";
 			} else if (ctx.LITERAL() != null) {
