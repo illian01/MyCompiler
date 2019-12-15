@@ -141,19 +141,7 @@ public class SymbolTable {
 		_fsymtable.put("_print", printlninfo);
 		_fsymtable.put("main", maininfo);
 	}
-
-	public String getFunSpecStr(String fname) {
-		return _fsymtable.get(fname).sigStr;
-	}
-
-	String getVarId(String name){
-		if(_lsymtable.containsKey(name))
-			return Integer.toString(_lsymtable.get(name).id);
-		else if(_gsymtable.containsKey(name))
-			return Integer.toString(_gsymtable.get(name).id);
-		return "";
-	}
-
+	
 	String newLabel() {
 		return "label" + _labelID++;
 	}
