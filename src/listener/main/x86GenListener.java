@@ -251,7 +251,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			}
 			else if (ctx.IDENT() != null) {
 				String varname = ctx.getChild(0).getText();
-				if (symbolTable.isLocalVar(varname))
+				if (symbolTable.isLocalVar(varname))//local variable
 					expr += "mov eax, dword [ebp - " + symbolTable.getLocalOffset(varname) + "]\n";
 				else if( symbolTable.isargVar(varname))
 					expr += "mov eax, [ebp + " + symbolTable.getargOffset(varname) + "]\n";
@@ -272,24 +272,35 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		} else if (ctx.getChildCount() == 2) { // UnaryOperation
 			expr = handleUnaryExpr(ctx, expr);
 		} else if (ctx.getChildCount() == 3) {
-			if (symbolTable.isLocalVar(ctx.getChild(0).getText()) && ctx.getChild(1).getText().contentEquals("=")) {
+			
+			if (symbolTable.isLocalVar(ctx.getChild(0).getText()) 
+					&& ctx.getChild(1).getText().contentEquals("=")) {
+				
 				String varname = ctx.getChild(0).getText();
+				
 				if(ctx.getChild(2).getChildCount()>1 ||
 						(ctx.getChild(2).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(2).getText()))) {
+					//로컬 변수에 상수가 아닌값이나 계산식이 올때
 					expr+= newTexts.get(ctx.getChild(2))+
 							"mov dword [ebp - " + symbolTable.getLocalOffset(varname) + "], eax\n";
 				}
-				else {
+				else {//로컬 변수에 상수가 들어올때
 					expr += "mov dword [ebp - " + symbolTable.getLocalOffset(varname) + "], " + newTexts.get(ctx.getChild(2))
 							+ "\n";
 				}
-			} else if (symbolTable.isglobalVar(ctx.getChild(0).getText())&& ctx.getChild(1).getText().equals("=")) {
+			} 
+			else if (symbolTable.isglobalVar(ctx.getChild(0).getText())
+					&& ctx.getChild(1).getText().equals("=")) {
+				
 				String varname = ctx.getChild(0).getText();
+				
 				if(ctx.getChild(2).getChildCount()>1 ||
 						(ctx.getChild(2).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(2).getText()))) {
+					//글로벌 변수에 상수가 아닌 값이나 계산식이 들어올때
 					expr+= newTexts.get(ctx.getChild(2))+"\n"+"mov dword [" +varname + "], eax\n";
 				}
 				else{
+					//글로버 변수에 상수가 들어올때
 					expr += "mov dword [" +varname + "], " + newTexts.get(ctx.getChild(2))+ "\n";
 				}
 
@@ -306,9 +317,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		}
 		// IDENT '(' args ')' | IDENT '[' expr ']'
 		else if (ctx.getChildCount() == 4) {
+			
 			if (ctx.args() != null) { // function calls
 				expr = handleFunCall(ctx, expr);
-			} else if (symbolTable.isglobalVar(ctx.getChild(0).getText())) { // expr
+			} 
+			else if (symbolTable.isglobalVar(ctx.getChild(0).getText())) { // find global offset to print
 				String varname = ctx.getChild(0).getText();
 				int index = get_globalarrayindex(ctx) * 4;
 				if (index == 0) {
@@ -316,7 +329,8 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				} else {
 					expr += "mov eax , dword [" + varname + "+" + index + "] \n";
 				}
-			} else {
+			} 
+			else {//Find local offset to print
 				String varname = ctx.getChild(0).getText();
 				int offset = symbolTable.getLocalOffset(varname) - get_intarrayindex(ctx);
 				expr += "mov eax, dword [ebp - " + offset + "]\n";
@@ -327,20 +341,25 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 		else { // Arrays: TODO
 			if (!symbolTable.isglobalVar(ctx.getParent().getChild(0).getText())) {
 				String varname = ctx.getChild(0).getText();
+				
 				if (symbolTable.isglobalVar(varname)) {
+					
 					int index = get_globalarrayindex(ctx) * 4;
+					
 					if(ctx.getChild(5).getChildCount()>1
-							|| (ctx.getChild(5).getChildCount()==1 
-							&&symbolTable.iseachVar(ctx.getChild(5).getText()))) {
+							|| (ctx.getChild(5).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(5).getText()))) {
+						//배열에 변수 혹은 연산식으로 값이 들어올때
 						expr+= newTexts.get(ctx.getChild(5));
+						
 						if (index == 0) {
 							expr += "mov dword [" + varname + "] , eax \n";
 						} else {
 							expr += "mov dword [" + varname + "+" + index + "] , eax \n";
 						}
 					}
-					else{
+					else{//배열에 값을 상수로 줄때
 						int operand = get_operand_intvalue(ctx);
+						
 						if (index == 0) {
 							expr += "mov dword [" + varname + "] , "+ operand+" \n";
 						} else {
@@ -348,10 +367,12 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 						}
 					}
 				} else {//local
+					
 					int offset = symbolTable.getLocalOffset(varname) - get_intarrayindex(ctx);
-					if(ctx.getChild(5).getChildCount()>1  //배열에 변수 혹은 연산식으로 값이 들어올때
-							|| (ctx.getChild(5).getChildCount()==1 
-							&&symbolTable.iseachVar(ctx.getChild(5).getText()))) {
+					
+					if(ctx.getChild(5).getChildCount()>1  || 
+							(ctx.getChild(5).getChildCount()==1 &&symbolTable.iseachVar(ctx.getChild(5).getText()))) {
+						//배열에 변수 혹은 연산식으로 값이 들어올때
 						expr+= newTexts.get(ctx.getChild(5))+"mov dword [ebp - " + offset + "], eax \n";
 					}
 					else {//상수를 그냥 넣을때
