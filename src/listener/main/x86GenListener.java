@@ -577,9 +577,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			expr = newTexts.get(ctx.args()) + "push dword format\n" + "call printf\n";
 		}
 		else{
-
+			int childCount = ctx.args().getChildCount();
+			int args = (childCount+1) - (childCount+1)/2;
 			expr += newTexts.get(ctx.args())
 					+ "call " + funName + "\n";
+			expr += "add esp, "+args*4+"\n";
 		}
 		return expr;
 	}
@@ -599,7 +601,6 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				argsStr += newTexts.get(ctx.expr(i));
 				argsStr += "push dword eax\n";
 			}
-
 		}
 		newTexts.put(ctx, argsStr);
 	}
