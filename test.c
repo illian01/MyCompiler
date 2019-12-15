@@ -1,11 +1,10 @@
-int global_var = 5;
-
 void main() 
 {
-	int a = 3;
-	int b[5];
-	b[1]=3;
-	a = global_var+4+b[1];
-	print_d(a);	
-}
+   int i = 0;
+   int global_array[6];
+   int array[5];
+   array[3] = 5;
+   print_d(array[3]);
 
+  
+}

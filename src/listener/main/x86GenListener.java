@@ -1,3 +1,4 @@
+
 package listener.main;
 
 import java.util.Hashtable;
@@ -326,17 +327,22 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			} 
 			else if (symbolTable.isglobalVar(ctx.getChild(0).getText())) { // find global offset to print
 				String varname = ctx.getChild(0).getText();
-				int index = get_intarrayindex(ctx) * 4;
-				if (index == 0) {
-					expr += "mov eax , dword [" + varname + "] \n";
-				} else {
-					expr += "mov eax , dword [" + varname + "+" + index + "] \n";
-				}
+				
+					expr += newTexts.get(ctx.getChild(2));
+					expr += "mov ebx, eax\n";
+					expr += "mov ebx, 4\n";
+					expr += "imul eax, ebx\n";
+					expr += "mov eax , dword [" + varname + " + eax ] \n";
+				
 			} 
 			else {//Find local offset to print
 				String varname = ctx.getChild(0).getText();
-				int offset = symbolTable.getLocalOffset(varname) - get_intarrayindex(ctx);
-				expr += "mov eax, dword [ebp - " + offset + "]\n";
+				expr += newTexts.get(ctx.getChild(2));
+				expr += "mov ebx, eax\n";
+				expr += "lea ecx, [ ebp - " + symbolTable.getLocalOffset(varname)+"]\n";
+				//int offset = symbolTable.getLocalOffset(varname) - get_intarrayindex(ctx);
+				expr += "mov eax, dword [ ecx + ebx * 4  ]\n";
+				expr += "mov eax, dword [ eax ]\n";
 			}
 		}
 
@@ -347,7 +353,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				
 				if (symbolTable.isglobalVar(varname)) {
 					
-					int index = get_intarrayindex(ctx) * 4;
+					int index = get_intarrayindex(ctx);
 					
 					if(ctx.getChild(5).getChildCount()>1
 							|| (ctx.getChild(5).getChildCount()==1 &&symbolTable.is_existVar(ctx.getChild(5).getText()))) {
@@ -605,4 +611,3 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 	}
 
 }
-
