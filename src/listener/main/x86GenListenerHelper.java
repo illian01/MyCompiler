@@ -94,7 +94,7 @@ public class x86GenListenerHelper {
 		return Integer.parseInt(ctx.getChild(5).getChild(0).getText()); 
 	}
 	static int get_intarrayindex(MiniCParser.ExprContext ctx) {
-		return Integer.parseInt(ctx.getChild(2).getChild(0).getText())*4; 
+		return Integer.parseInt(ctx.getChild(2).getChild(0).getText())*4;
 	}
 	static Boolean isNumeric(String str){
 		try {

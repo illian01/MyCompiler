@@ -1,18 +1,9 @@
 package listener.main;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
-import javax.swing.plaf.synth.SynthSplitPaneUI;
-
 import generated.MiniCParser;
-import generated.MiniCParser.Fun_declContext;
-import generated.MiniCParser.Local_declContext;
-import generated.MiniCParser.ParamsContext;
-import generated.MiniCParser.Type_specContext;
-import generated.MiniCParser.Var_declContext;
-import listener.main.SymbolTable.Type;
 import static listener.main.x86GenListenerHelper.*;
 
 
@@ -72,9 +63,7 @@ public class SymbolTable {
 	void initFunDecl(){		// at each func decl
 		_lsymtable.clear();
 		_localVarID = 0;
-		_labelID = 0;
 		_argVarID = 0;
-		_stringID = 0;
 		_localOffset = 0;
 		_argOffset = 8;
 	}
@@ -118,7 +107,7 @@ public class SymbolTable {
 		for(int i = 0; i < params.param().size(); i++) {
 			String varname = getParamName(params.param(i));
 			Type type = getParamType(params.param(i));
-			this._asymtable.put(varname, new VarInfo(type, _argVarID++, _argOffset));
+			this._lsymtable.put(varname, new VarInfo(type, _argVarID++, -1*_argOffset));
 			this._argOffset += 4;
 		}
 	}
@@ -130,6 +119,9 @@ public class SymbolTable {
 	// local
 	public int getTotalLocalOffset() {
 		return _localOffset;
+	}
+	public int getTotalargsOffset() {
+		return _argVarID*4;
 	}
 
 	public int getLocalOffset(String varname) {

@@ -289,8 +289,8 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 							"mov dword [ebp - " + symbolTable.getLocalOffset(varname) + "], eax\n";
 				}
 				else {//로컬 변수에 상수가 들어갈때
-					expr += "mov dword [ebp - " + symbolTable.getLocalOffset(varname) + "], " + newTexts.get(ctx.getChild(2))
-							+ "\n";
+					expr += newTexts.get(ctx.getChild(2))+
+							"mov dword [ebp - " + symbolTable.getLocalOffset(varname) + "], eax \n";
 				}
 			} 
 			else if (symbolTable.isglobalVar(ctx.getChild(0).getText())
@@ -339,10 +339,16 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				String varname = ctx.getChild(0).getText();
 				expr += newTexts.get(ctx.getChild(2));
 				expr += "mov ebx, eax\n";
-				expr += "lea ecx, [ ebp - " + symbolTable.getLocalOffset(varname)+"]\n";
+				int target = symbolTable.getLocalOffset(varname);
+				if(target<0) {
+					expr += "lea ecx, [ ebp + " + target*-1+"]\n";
+				}
+				else {
+					expr += "lea ecx, [ ebp - " + symbolTable.getLocalOffset(varname)+"]\n";	
+				}
 				//int offset = symbolTable.getLocalOffset(varname) - get_intarrayindex(ctx);
 				expr += "mov eax, dword [ ecx + ebx * 4  ]\n";
-				expr += "mov eax, dword [ eax ]\n";
+				//expr += "mov eax, dword [ eax ]\n";
 			}
 		}
 
