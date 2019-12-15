@@ -2,7 +2,9 @@ package listener.main;
 
 import static listener.main.x86GenListenerHelper.isVoidF;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import generated.MiniCParser;
 import generated.MiniCParser.ExprContext;
@@ -112,6 +114,68 @@ public class x86GenListenerHelper {
     static String tripString(String str){
         String[] split = str.split("\"");
         return split[1];
+    }
+    
+    static String getString_withEscape(String str) {
+    	String remove_doublequotes = str.split("\"")[1];
+    	List<String> str_array  = new ArrayList();
+    	
+    	String store = "";
+    	String result="";
+    	for(int i=0; i<remove_doublequotes.length();i++) {
+    		if(remove_doublequotes.charAt(i)=='\\') {
+    			if(store.length()!=0)
+    			str_array.add(store);
+    			String escape = remove_doublequotes.substring(i,i+2);
+    			i++;
+    			str_array.add(escape);
+    			store="";
+    		}
+    		else{
+    			store+=remove_doublequotes.charAt(i);
+    		}
+    	}
+    	
+    	for(int i=0; i<str_array.size();i++) {
+    		if(str_array.get(i).contains("\\")) {
+    			result+=","+get_escape(str_array.get(i))+",";
+    		}
+    		else {
+    			result+="\""+str_array.get(i)+"\"";
+    		}
+    	}
+    	result+=",0";
+    	result=result.replaceAll(",,",",");
+    	return result;
+    }
+    
+    static String get_escape(String escape) {
+    	switch(escape){
+    	case "\\n":
+    		return "10";
+    	case "\\a":
+    		return "7";
+    	case "\\b":
+    		return "8";
+    	case "\\f":
+    		return "12";
+    	case "\\r":
+    		return "13";
+    	case "\\t":
+    		return "9";
+    	case "\\v":
+    		return "11";
+    	case "\\\\":
+    		return "92";
+    	case "\\'":
+    		return "39";
+    	case "\\\"":
+    		return "34";
+    	case "\\?":
+    		return "63";
+    	default :
+    		return null;
+    	}
     }
 	
 }
