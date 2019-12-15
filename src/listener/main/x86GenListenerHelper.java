@@ -138,18 +138,9 @@ public class x86GenListenerHelper {
 			return false;
 		}
 	}
-    static String getkey(String str){
+    static String getStringFormat(String str){
 	    String[] strip = str.split(" ");
-        String stripstring = "";
-        for( String a : strip )
-            stripstring += a;
-        str = stripstring;
-        if(isNumeric(str)) {
-            return "str" + str;
-        }
-        else {
-            return str;
-        }
+        return strip[0];
     }
     static String tripString(String str){
         String[] split = str.split("\"");
