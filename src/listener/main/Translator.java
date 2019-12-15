@@ -7,7 +7,7 @@ import generated.*;
 
 public class Translator {
 	enum OPTIONS {
-		PRETTYPRINT, X86, UCODEGEN, ERROR
+		PRETTYPRINT, X86, ERROR
 	}
 	private static OPTIONS getOption(String[] args){
 		if (args.length < 1)
@@ -20,11 +20,7 @@ public class Translator {
 		if (args[0].startsWith("-b") 
 				|| args[0].startsWith("-B"))
 			return OPTIONS.X86;
-		
-		if (args[0].startsWith("-u") 
-				|| args[0].startsWith("-U"))
-			return OPTIONS.UCODEGEN;
-		
+
 		return OPTIONS.ERROR;
 	}
 	
@@ -44,11 +40,6 @@ public class Translator {
 			case X86:
 				walker.walk(new x86GenListener(), tree );
 				break;
-			/*	
-			case UCODEGEN:
-				walker.walk(new UCodeGenListener(), tree );
-				break;
-			*/
 			default:
 				break;
 		}
