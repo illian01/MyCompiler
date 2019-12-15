@@ -244,7 +244,14 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				return;
 			}else if (ctx.STRING() != null){
 				String target = ctx.getText();
+				if(target.contains("\\")) {
+					target = getString_withEscape(target);
+				}
+				else {
+					target+=", 0";
+				}
 				symbolTable.putString(target);
+				//String key = getStringFormat(symbolTable.getString(target));
 				String key = getStringFormat(symbolTable.getString(target));
 				expr += "mov eax, "+key+"\n";
 
