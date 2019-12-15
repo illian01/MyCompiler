@@ -289,11 +289,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				
 				if(ctx.getChild(2).getChildCount()>1 ||
 						(ctx.getChild(2).getChildCount()==1 &&symbolTable.is_existVar(ctx.getChild(2).getText()))) {
-					//·ÎÄÃ º¯¼ö¿¡ »ó¼ö°¡ ¾Æ´Ñ°ªÀÌ³ª °è»ê½ÄÀÌ ¿Ã¶§
+					//ë¡œì»¬ ë³€ìˆ˜ì— ë³€ìˆ˜ í˜¹ì€ ê³„ì‚°ì‹ì´ ë“¤ì–´ê°ˆë•Œ
 					expr+= newTexts.get(ctx.getChild(2))+
 							"mov dword [ebp - " + symbolTable.getLocalOffset(varname) + "], eax\n";
 				}
-				else {//·ÎÄÃ º¯¼ö¿¡ »ó¼ö°¡ µé¾î¿Ã¶§
+				else {//ë¡œì»¬ ë³€ìˆ˜ì— ìƒìˆ˜ê°€ ë“¤ì–´ê°ˆë•Œ
 					expr += "mov dword [ebp - " + symbolTable.getLocalOffset(varname) + "], " + newTexts.get(ctx.getChild(2))
 							+ "\n";
 				}
@@ -305,11 +305,11 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				
 				if(ctx.getChild(2).getChildCount()>1 ||
 						(ctx.getChild(2).getChildCount()==1 &&symbolTable.is_existVar(ctx.getChild(2).getText()))) {
-					//±Û·Î¹ú º¯¼ö¿¡ »ó¼ö°¡ ¾Æ´Ñ °ªÀÌ³ª °è»ê½ÄÀÌ µé¾î¿Ã¶§
+					//ê¸€ë¡œë²Œ ë³€ìˆ˜ì— ë³€ìˆ˜ í˜¹ì€ ê³„ì‚°ì‹ì´ ë“¤ì–´ê°ˆë•Œ
 					expr+= newTexts.get(ctx.getChild(2))+"\n"+"mov dword [" +varname + "], eax\n";
 				}
 				else{
-					//±Û·Î¹ö º¯¼ö¿¡ »ó¼ö°¡ µé¾î¿Ã¶§
+					//ê¸€ë¡œë²Œ ë³€ìˆ˜ì— ìƒìˆ˜ê°€ ë“¤ì–´ê°ˆë•Œ
 					expr += "mov dword [" +varname + "], " + newTexts.get(ctx.getChild(2))+ "\n";
 				}
 
@@ -357,7 +357,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 					
 					if(ctx.getChild(5).getChildCount()>1
 							|| (ctx.getChild(5).getChildCount()==1 &&symbolTable.is_existVar(ctx.getChild(5).getText()))) {
-						//¹è¿­¿¡ º¯¼ö È¤Àº ¿¬»ê½ÄÀ¸·Î °ªÀÌ µé¾î¿Ã¶§
+						//ê¸€ë¡œë²Œ ë°°ì—´ì— ë³€ìˆ˜ í˜¹ì€ ê³„ì‚°ì‹ì´ ë“¤ì–´ê°ˆë•Œ
 						expr+= newTexts.get(ctx.getChild(5));
 						
 						if (index == 0) {
@@ -366,7 +366,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 							expr += "mov dword [" + varname + "+" + index + "] , eax \n";
 						}
 					}
-					else{//¹è¿­¿¡ °ªÀ» »ó¼ö·Î ÁÙ¶§
+					else{//ê¸€ë¡œë²Œ ë°°ì—´ì— ìƒìˆ˜ê°€ ë“¤ì–´ê°ˆë•Œ
 						int operand = get_operand_intvalue(ctx);
 						
 						if (index == 0) {
@@ -381,10 +381,10 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 					
 					if(ctx.getChild(5).getChildCount()>1  || 
 							(ctx.getChild(5).getChildCount()==1 &&symbolTable.is_existVar(ctx.getChild(5).getText()))) {
-						//¹è¿­¿¡ º¯¼ö È¤Àº ¿¬»ê½ÄÀ¸·Î °ªÀÌ µé¾î¿Ã¶§
+						//ë¡œì»¬ ë°°ì—´ì— ë³€ìˆ˜ í˜¹ì€ ê³„ì‚°ì‹ì˜ ê°’ì´ ë“¤ì–´ê°ˆë•Œ
 						expr+= newTexts.get(ctx.getChild(5))+"mov dword [ebp - " + offset + "], eax \n";
 					}
-					else {//»ó¼ö¸¦ ±×³É ³ÖÀ»¶§
+					else {//ë¡œì»¬ ë°°ì—´ì— ìƒìˆ˜ê°’ì´ ë“¤ì–´ê°ˆë•Œ
 						expr += "mov dword [ebp - " + offset + "], " + get_operand_intvalue(ctx) + "\n";
 					}
 				}
