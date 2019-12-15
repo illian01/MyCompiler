@@ -67,7 +67,6 @@ public class SymbolTable {
 
 	SymbolTable(){
 		initFunDecl();
-		initFunTable();
 	}
 
 	void initFunDecl(){		// at each func decl
@@ -106,15 +105,6 @@ public class SymbolTable {
 			return this._ssymtable.get(str);
 	}
 
-	void putargVar(String varname, Type type){
-		this._asymtable.put(varname, new VarInfo(type, _argVarID++, _argOffset));
-		_argOffset += 4;
-	}
-
-	void putGlobalVar(String varname, Type type){
-		this._gsymtable.put(varname, new VarInfo(type, _globalVarID++));
-	}
-
 	void putLocalVarWithInitVal(String varname, Type type, int initVar){
 		_localOffset += 4;
 		this._lsymtable.put(varname, new VarInfo(type, _localVarID++, initVar, _localOffset));
@@ -131,28 +121,6 @@ public class SymbolTable {
 			this._asymtable.put(varname, new VarInfo(type, _argVarID++, _argOffset));
 			this._argOffset += 4;
 		}
-	}
-
-	private void initFunTable() {
-		FInfo printlninfo = new FInfo();
-		printlninfo.sigStr = "java/io/PrintStream/println(I)V";
-
-		FInfo maininfo = new FInfo();
-		maininfo.sigStr = "main([Ljava/lang/String;)V";
-		_fsymtable.put("_print", printlninfo);
-		_fsymtable.put("main", maininfo);
-	}
-
-	public String getFunSpecStr(String fname) {
-		return _fsymtable.get(fname).sigStr;
-	}
-
-	String getVarId(String name){
-		if(_lsymtable.containsKey(name))
-			return Integer.toString(_lsymtable.get(name).id);
-		else if(_gsymtable.containsKey(name))
-			return Integer.toString(_gsymtable.get(name).id);
-		return "";
 	}
 
 	String newLabel() {
