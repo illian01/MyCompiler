@@ -92,7 +92,7 @@ public class SymbolTable {
 
 	}
 	void putString(String str){
-		this._ssymtable.put(str,"format" + _stringID++  + " db \"" + tripString(str) + "\", 10, 0\n");	
+		this._ssymtable.put(str,"format" + _stringID++  + " db \"" + tripString(str) + "\", 0\n");
 	}
 
 

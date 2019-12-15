@@ -20,5 +20,5 @@ void main()
    global_array[2] = 0;
    
    printf("%d %d", local_var, local_array[1]);
-
+   printf("%s\t\n%d ~ 35[2]", "abc");
 }
