@@ -1,10 +1,59 @@
-int add( int a, int b, int c ){
-    return a + b + c;
+int global_var;
+int global_array[3];
+
+int fibo(int n)
+{
+   if(n == 0) return 0;
+   if(n == 1) return 1;
+   return fibo(n-1) + fibo(n-2);
 }
+
+int sumFromZero(int n)
+{
+   int i = 0;
+   int sum = 0;
+   while(i < n)
+   {
+      sum = sum + i;
+      i = i + 1;
+   }
+
+   return sum;
+}
+
 
 void main()
 {
-   int n = 5;
-   printf("%d %d %d\n", 5, 3, 2 );
-}
+   int i = 0;
+   int local_var;
+   int local_var_init = 10;
+   int local_array[6];
 
+   local_array[0] = 1;
+   local_array[1] = 2;
+   local_array[2] = 3;
+   local_array[3] = 4;
+   local_array[4] = 5;
+   local_array[5] = 6;
+
+   local_var = local_array[0];
+   printf("1 : local_var = %d\n", local_var);
+
+   local_var = local_var_init;
+   printf("2 : local_var = %d\n", local_var);
+
+   local_array[0] = 7;
+   local_array[1] = 8;
+   local_array[2] = 9;
+   local_array[3] = 10;
+   local_array[4] = 11;
+   local_array[5] = 12;
+
+
+   global_array[0] = 100;
+   global_array[1] = 200;
+   global_array[2] = 300;
+   printf("17 : fibo(20) = %d\n", fibo(20));
+
+   printf("-end-\n");
+}
