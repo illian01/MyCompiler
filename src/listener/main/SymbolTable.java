@@ -67,7 +67,6 @@ public class SymbolTable {
 
 	SymbolTable(){
 		initFunDecl();
-		initFunTable();
 	}
 
 	void initFunDecl(){		// at each func decl
@@ -105,15 +104,6 @@ public class SymbolTable {
 			return this._ssymtable.get(str);
 	}
 
-	void putargVar(String varname, Type type){
-		this._asymtable.put(varname, new VarInfo(type, _argVarID++, _argOffset));
-		_argOffset += 4;
-	}
-
-	void putGlobalVar(String varname, Type type){
-		this._gsymtable.put(varname, new VarInfo(type, _globalVarID++));
-	}
-
 	void putLocalVarWithInitVal(String varname, Type type, int initVar){
 		_localOffset += 4;
 		this._lsymtable.put(varname, new VarInfo(type, _localVarID++, initVar, _localOffset));
@@ -132,16 +122,6 @@ public class SymbolTable {
 		}
 	}
 
-	private void initFunTable() {
-		FInfo printlninfo = new FInfo();
-		printlninfo.sigStr = "java/io/PrintStream/println(I)V";
-
-		FInfo maininfo = new FInfo();
-		maininfo.sigStr = "main([Ljava/lang/String;)V";
-		_fsymtable.put("_print", printlninfo);
-		_fsymtable.put("main", maininfo);
-	}
-	
 	String newLabel() {
 		return "label" + _labelID++;
 	}

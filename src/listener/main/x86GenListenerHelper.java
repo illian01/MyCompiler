@@ -1,6 +1,5 @@
 package listener.main;
 
-import static listener.main.x86GenListenerHelper.isIntF;
 import static listener.main.x86GenListenerHelper.isVoidF;
 
 import java.util.Hashtable;
@@ -20,17 +19,7 @@ import listener.main.SymbolTable.VarInfo;
 
 public class x86GenListenerHelper {
 	
-	// <boolean functions>
-	
-	static boolean isFunDecl(MiniCParser.ProgramContext ctx, int i) {
-		return ctx.getChild(i).getChild(0) instanceof MiniCParser.Fun_declContext;
-	}
-	
-	// type_spec IDENT '[' ']'
-	static boolean isArrayParamDecl(ParamContext param) {
-		return param.getChildCount() == 4;
-	}
-	
+
 	// global vars
 	static int initVal(Var_declContext ctx) {
 		return Integer.parseInt(ctx.LITERAL().getText());
@@ -63,28 +52,6 @@ public class x86GenListenerHelper {
 	
 	static boolean isVoidF(Fun_declContext ctx) {
 		return ctx.getChild(0).getText().equals("void");
-	}
-	
-	static boolean isIntF(Fun_declContext ctx) {
-		return ctx.getChild(0).getText().equals("int");
-	}
-	
-	static boolean isIntReturn(MiniCParser.Return_stmtContext ctx) {
-		return ctx.getChildCount() == 3;
-	}
-
-	static boolean isVoidReturn(MiniCParser.Return_stmtContext ctx) {
-		return ctx.getChildCount() == 2;
-	}
-	
-	// <information extraction>
-	static String getFReturnType(Fun_declContext ctx) {
-		if(isIntF(ctx))
-			return "I";
-		if(isVoidF(ctx))
-			return "V";
-		
-		return "";
 	}
 
 	// params
