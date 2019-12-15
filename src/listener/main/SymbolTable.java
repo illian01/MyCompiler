@@ -62,6 +62,7 @@ public class SymbolTable {
 	private int _globalVarID = 0;
 	private int _localVarID = 0;
 	private int _labelID = 0;
+	private int _stringID = 0;
 	private int _argVarID = 0;
 
 	SymbolTable(){
@@ -74,6 +75,7 @@ public class SymbolTable {
 		_localVarID = 0;
 		_labelID = 0;
 		_argVarID = 0;
+		_stringID = 0;
 		_localOffset = 0;
 		_argOffset = 8;
 	}
@@ -90,11 +92,7 @@ public class SymbolTable {
 
 	}
 	void putString(String str){
-			String strip = getkey(str);
-			if(isNumeric(str))
-				this._ssymtable.put(str,"str"+ strip  + " db \"" + str + "\", 10, 0\n");
-			else
-				this._ssymtable.put(str,strip  + " db \"" + str + "\", 10, 0\n");
+		this._ssymtable.put(str,"format" + _stringID++  + " db \"" + tripString(str) + "\", 0\n");
 	}
 
 
