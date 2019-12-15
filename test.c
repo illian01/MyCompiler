@@ -20,4 +20,5 @@ void main()
    global_array[2] = 0;
    
    printf("%d %d", local_var, local_array[1]);
+
 }

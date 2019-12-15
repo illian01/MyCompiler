@@ -78,20 +78,6 @@ public class x86GenListenerHelper {
 	}
 	
 	// <information extraction>
-	static String getStackSize(Fun_declContext ctx) {
-		return "32";
-	}
-	static String getLocalVarSize(Fun_declContext ctx) {
-		return "32";
-	}
-	static String getTypeText(Type_specContext typespec) {
-		String type = typespec.getText(); 
-		if(type.compareTo("int") == 0)
-			return "I";
-		
-		return "";
-	}
-	
 	static String getFReturnType(Fun_declContext ctx) {
 		if(isIntF(ctx))
 			return "I";
@@ -113,16 +99,6 @@ public class x86GenListenerHelper {
 		return null;
 	}
 	
-	static String getParamTypesText(ParamsContext params) {
-		String typeText = "";
-		
-		for(int i = 0; i < params.param().size(); i++) {
-			MiniCParser.Type_specContext typespec = (MiniCParser.Type_specContext)  params.param(i).getChild(0);
-			typeText += getTypeText(typespec); // + ";";
-		}
-		return typeText;
-	}
-	
 	static String getLocalVarName(Local_declContext local_decl) {
 		return local_decl.getChild(1).getText();
 	}
@@ -141,25 +117,6 @@ public class x86GenListenerHelper {
 	
 	static boolean noElse(If_stmtContext ctx) {
 		return ctx.getChildCount() <= 5;
-	}
-	
-	static String getFunProlog() {
-		String prologue = "";
-		
-		prologue += ".class public Test\n";
-		prologue += ".super java/lang/Object\n\n";
-		
-		prologue += ".method public <init>()V\n";
-		prologue += "aload_0\n";
-		prologue += "invokenonvirtual java/lang/Object/<init>()V\n";
-		prologue += "return\n";
-		prologue += ".end method\n\n";
-		
-		return prologue;
-	}
-	
-	static String getCurrentClassName() {
-		return "Test";
 	}
 	static int get_localArraysize(MiniCParser.Local_declContext ctx) {
 		return Integer.parseInt(ctx.getChild(3).getText()); 
