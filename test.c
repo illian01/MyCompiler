@@ -1,5 +1,11 @@
+int global_var = 5;
+
 void main() 
 {
-   printf("%s\t%d ~ 35[2]\n", "abc",5);
+	int a = 3;
+	int b[5];
+	b[1]=3;
+	a = global_var+4+b[1];
+	print_d(a);	
 }
 

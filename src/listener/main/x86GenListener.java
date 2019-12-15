@@ -332,7 +332,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			} 
 			else if (symbolTable.isglobalVar(ctx.getChild(0).getText())) { // find global offset to print
 				String varname = ctx.getChild(0).getText();
-				int index = get_globalarrayindex(ctx) * 4;
+				int index = get_intarrayindex(ctx);
 				if (index == 0) {
 					expr += "mov eax , dword [" + varname + "] \n";
 				} else {
@@ -353,7 +353,7 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 				
 				if (symbolTable.isglobalVar(varname)) {
 					
-					int index = get_globalarrayindex(ctx) * 4;
+					int index = get_intarrayindex(ctx);
 					
 					if(ctx.getChild(5).getChildCount()>1
 							|| (ctx.getChild(5).getChildCount()==1 &&symbolTable.is_existVar(ctx.getChild(5).getText()))) {
