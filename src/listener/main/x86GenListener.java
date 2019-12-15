@@ -257,10 +257,12 @@ public class x86GenListener extends MiniCBaseListener implements ParseTreeListen
 			}
 			else if (ctx.IDENT() != null) {
 				String varname = ctx.getChild(0).getText();
-				if (symbolTable.isLocalVar(varname))//local variable
-					expr += "mov eax, dword [ebp - " + symbolTable.getLocalOffset(varname) + "]\n";
-				else if( symbolTable.isargVar(varname))
-					expr += "mov eax, [ebp + " + symbolTable.getargOffset(varname) + "]\n";
+				if (symbolTable.isLocalVar(varname)) {//local variable
+					if( symbolTable.getLocalOffset(varname) > 0 )
+						expr += "mov eax, dword [ebp - " + symbolTable.getLocalOffset(varname) + "]\n";
+					else
+						expr += "mov eax, dword [ebp + " + -1 * symbolTable.getLocalOffset(varname) + "]\n";
+				}
 				else if (symbolTable.isglobalVar(varname))
 					expr += "mov eax, [ " + varname + " ]\n";
 				else

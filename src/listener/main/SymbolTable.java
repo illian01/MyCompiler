@@ -108,7 +108,7 @@ public class SymbolTable {
 		for(int i = 0; i < params.param().size(); i++) {
 			String varname = getParamName(params.param(i));
 			Type type = getParamType(params.param(i));
-			this._asymtable.put(varname, new VarInfo(type, _argVarID++, _argOffset));
+			this._lsymtable.put(varname, new VarInfo(type, _argVarID++, -1*_argOffset));
 			this._argOffset += 4;
 		}
 	}
