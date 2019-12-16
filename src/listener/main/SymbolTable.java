@@ -42,10 +42,11 @@ public class SymbolTable {
 	}
 
 	private Map<String, VarInfo> _lsymtable = new HashMap<>();	// local v.
-	private Map<String, VarInfo> _asymtable = new HashMap<>();	// local v.
+	private Map<String, VarInfo> _asymtable = new HashMap<>();	//  param
 	private Map<String, VarInfo> _gsymtable = new HashMap<>();	// global v.
 	private Map<String, FInfo> _fsymtable = new HashMap<>();	// function
 	private Map<String, String> _ssymtable = new HashMap<>();	// function
+
 
 	private int _localOffset = 0;
 	private int _argOffset = 8;
@@ -64,6 +65,7 @@ public class SymbolTable {
 		_lsymtable.clear();
 		_localVarID = 0;
 		_argVarID = 0;
+		_stringID = 0;
 		_localOffset = 0;
 		_argOffset = 8;
 	}
@@ -106,6 +108,9 @@ public class SymbolTable {
 		for(int i = 0; i < params.param().size(); i++) {
 			String varname = getParamName(params.param(i));
 			Type type = getParamType(params.param(i));
+			if (type.equals(Type.INTARRAY)) {
+				this._asymtable.put(varname, new VarInfo(type, _argVarID++, -1*_argOffset));
+			}
 			this._lsymtable.put(varname, new VarInfo(type, _argVarID++, -1*_argOffset));
 			this._argOffset += 4;
 		}
@@ -129,7 +134,6 @@ public class SymbolTable {
 	public int getargOffset(String varname) {
 		return _asymtable.get(varname).offset;
 	}
-
 	public boolean isLocalVar(String varname) {
 		return _lsymtable.containsKey(varname);
 	}
@@ -145,6 +149,15 @@ public class SymbolTable {
 			return true;
 		}
 		return false;
+	}
+	public boolean isLocalArray(String name) {
+		Type type = _lsymtable.get(name).type;
+		if (type.equals(Type.INTARRAY)) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	public boolean is_existVar(String varname) {
 		if(isLocalVar(varname) || isglobalVar(varname)) {

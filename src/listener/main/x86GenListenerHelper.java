@@ -62,6 +62,9 @@ public class x86GenListenerHelper {
 	}
 	
 	static Type getParamType(ParamContext param) {
+		if (param.getChildCount()==4) {
+			return Type.INTARRAY;
+		}
 		if(param.getChild(0).getText().equals("int"))
 			return Type.INT;
 		
