@@ -50,10 +50,10 @@ void main()
    local_array[5] = 6;
    
    local_var = local_array[0];
-   printf("1 : local_var = %d\n", local_var);
+   printf("1 : local_var call_array[0] = %d\n", local_var);
    
    local_var = local_var_init;
-   printf("2 : local_var = %d\n", local_var);
+   printf("2 : local_var init 10 = %d\n", local_var);
    
    printf("---------------------------------------------\n");
    while(i < 6) {
@@ -68,7 +68,7 @@ void main()
    local_array[3] = 10;
    local_array[4] = 11;
    local_array[5] = 12;
-   
+   printf("Realloc array\n");
    i = 0;
    printf("--------------------------------------------\n");
    while(i < 6) {
@@ -84,6 +84,22 @@ void main()
    
    printf("16 : fibo(20) = %d\n", fibo(20));
    
+   local_var = local_array[0]+local_array[1];
+   
+   printf("17 : local_var = %d\n", local_var);
+
+   local_var = 10-3;
+   
+   printf("18 : local_var 10-3; = %d\n", local_var);
+   
+   local_var = 10*3;
+   
+   printf("19 : local_var 10*3 = %d\n", local_var);
+   
+   local_var = 12/3;
+   
+   printf("20 : local_var 12/3 = %d\n", local_var);
+
    printf("-end-\n");
 }
 
